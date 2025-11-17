@@ -1,0 +1,481 @@
+// ==========================================================================
+// ATOMIC DESIGN - HERBANATURA SIDEBAR COMPONENT (FIXED MOBILE)
+// ==========================================================================
+
+// TOKENS - Design System Variables
+$herba-primary: #28a745;
+$herba-primary-dark: #1e7e34;
+$herba-primary-light: #34ce57;
+$herba-secondary: #6c757d;
+$herba-light: #f8f9fa;
+$herba-dark: #343a40;
+
+// Sidebar Tokens
+$sidebar-width: 280px;
+$sidebar-collapsed-width: 70px;
+$sidebar-mobile-width: 280px;
+$sidebar-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$sidebar-border-radius: 8px;
+$sidebar-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+
+// Z-index scale
+$z-sidebar: 1000;
+$z-overlay: 999;
+$z-mobile-toggle: 1001;
+
+// ATOMS - Elementos básicos
+@mixin nav-icon {
+  font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
+  transition: $sidebar-transition;
+}
+
+@mixin nav-text {
+  font-weight: 500;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: $sidebar-transition;
+}
+
+@mixin button-reset {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  outline: none;
+}
+
+// MOLECULES - Componentes de navegación
+@mixin nav-link-base {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  margin: 0.125rem 0.5rem;
+  border-radius: $sidebar-border-radius;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  transition: $sidebar-transition;
+  position: relative;
+  border: 2px solid transparent;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: translateX(4px);
+  }
+
+  &:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
+  }
+
+  .nav-icon {
+    @include nav-icon;
+    margin-right: 0.875rem;
+    flex-shrink: 0;
+  }
+
+  .nav-text {
+    @include nav-text;
+    flex-grow: 1;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+  }
+}
+
+@mixin nav-link-active {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateX(4px);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: -0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background-color: white;
+    border-radius: 2px;
+  }
+}
+
+// ORGANISMS - Sidebar principal
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: $sidebar-width;
+  background: linear-gradient(180deg, $herba-primary 0%, $herba-primary-dark 100%);
+  color: white;
+  transition: $sidebar-transition;
+  z-index: $z-sidebar;
+  display: flex;
+  flex-direction: column;
+  box-shadow: $sidebar-shadow;
+  overflow: hidden;
+
+  // Estados del sidebar
+  &.collapsed {
+    width: $sidebar-collapsed-width;
+
+    .nav-link {
+      justify-content: center;
+      padding: 0.75rem;
+
+      .nav-icon {
+        margin-right: 0;
+      }
+
+      &::before {
+        left: -0.25rem;
+      }
+    }
+
+    .dropdown-toggle::after {
+      display: none;
+    }
+
+    .submenu-container {
+      display: none;
+    }
+
+    .user-info {
+      flex-direction: column;
+      text-align: center;
+
+      .user-avatar {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  // Sidebar móvil - ACTUALIZADO
+  @media (max-width: 767.98px) {
+    transform: translateX(-100%);
+    width: $sidebar-mobile-width;
+    transition: transform 0.3s ease-in-out;
+    
+    &.show-mobile {
+      transform: translateX(0);
+    }
+
+    // En móvil siempre mostrar texto
+    .nav-link {
+      .nav-text {
+        display: block !important;
+      }
+    }
+
+    .user-details {
+      display: block !important;
+    }
+
+    .badge {
+      display: inline-block !important;
+    }
+  }
+}
+
+// MOLECULES - Header del sidebar
+.sidebar-header {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+
+    .logo-icon {
+      font-size: 1.8rem;
+      color: white;
+      margin-right: 0.75rem;
+    }
+
+    .logo-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+  }
+
+  // Botón cerrar móvil
+  .sidebar-close {
+    @include button-reset;
+    color: white;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: $sidebar-transition;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+// ORGANISMS - Navegación
+.sidebar-nav-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem 0;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+.sidebar-nav {
+  .nav-item {
+    margin-bottom: 0.25rem;
+  }
+
+  .nav-link {
+    @include nav-link-base;
+
+    &.active {
+      @include nav-link-active;
+    }
+
+    &.dropdown-toggle {
+      position: relative;
+
+      &::after {
+        content: '\F285'; // chevron-right
+        font-family: 'bootstrap-icons';
+        border: none;
+        margin-left: auto;
+        margin-right: 0.25rem;
+        font-size: 0.8rem;
+        transition: transform 0.2s ease;
+      }
+
+      &.active::after {
+        transform: rotate(90deg);
+      }
+    }
+  }
+}
+
+// MOLECULES - Submenús
+.submenu-container {
+  overflow: hidden;
+  animation: slideDown 0.3s ease-out;
+}
+
+.submenu {
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+
+  .submenu-link {
+    @include nav-link-base;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    margin: 0.125rem 0;
+
+    .nav-icon {
+      font-size: 0.9rem;
+      margin-right: 0.75rem;
+    }
+
+    &.active {
+      @include nav-link-active;
+    }
+
+    &::before {
+      left: -1.25rem !important;
+    }
+  }
+}
+
+// MOLECULES - Footer del sidebar
+.sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: $sidebar-border-radius;
+  margin-bottom: 1rem;
+  transition: $sidebar-transition;
+
+  &.collapsed {
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .user-avatar {
+    i {
+      font-size: 2rem;
+      color: white;
+    }
+  }
+
+  .user-details {
+    margin-left: 0.75rem;
+    display: flex;
+    flex-direction: column;
+
+    .user-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: white;
+    }
+
+    .user-role {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+}
+
+// ATOMS - Botón toggle desktop
+.sidebar-toggle {
+  @include button-reset;
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: $sidebar-border-radius;
+  transition: $sidebar-transition;
+  font-size: 1rem;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
+  }
+}
+
+// ATOMS - Toggle móvil - ACTUALIZADO
+.mobile-toggle {
+  @include button-reset;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: $z-mobile-toggle;
+  background: $herba-primary;
+  color: white;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  transition: $sidebar-transition;
+
+  &:hover {
+    background: $herba-primary-dark;
+    transform: scale(1.1);
+  }
+
+  &:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// ATOMS - Overlay móvil
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: $z-overlay;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.3s ease-out;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+// ANIMATIONS
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 300px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// UTILITIES
+.nav-item:hover .nav-link:not(.active) {
+  color: white;
+}
+
+// Focus states para accesibilidad
+.nav-link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+// Prevenir scroll del body cuando el sidebar está abierto en móvil
+:global(body.sidebar-mobile-open) {
+  @media (max-width: 767.98px) {
+    overflow: hidden;
+  }
+}

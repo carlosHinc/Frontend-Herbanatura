@@ -1,0 +1,71 @@
+<div class="inventory-container">
+  <div class="header">
+    <h1>Inventario de Productos</h1>
+    <button class="btn-add">+ Agregar Producto</button>
+  </div>
+
+  <!-- Loading -->
+  @if (getProductsVM.productsSignal().loading) {
+  <div class="loading">
+    <p>Cargando productos...</p>
+  </div>
+  }
+
+  <!-- Error -->
+  @if (getProductsVM.productsSignal().error) {
+  <div class="error">
+    <p>{{ getProductsVM.productsSignal().error }}</p>
+    <button (click)="getProductsVM.retry()">Reintentar</button>
+  </div>
+  }
+
+  <!-- Tabla de productos -->
+  @if (!getProductsVM.productsSignal().loading &&
+  !getProductsVM.productsSignal().error &&
+  getProductsVM.productsSignal().products.length > 0) {
+  <div class="table-container">
+    <table class="products-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Laboratorio</th>
+          <th>Stock</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (product of getProductsVM.productsSignal().products; track
+        product.id) {
+        <tr>
+          <td class="product-name">{{ product.name }}</td>
+          <td class="laboratory">{{ product.laboratory }}</td>
+          <td>
+            <span class="stock-badge" [class.low-stock]="product.stock < 10">
+              {{ product.stock }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="btn-edit" title="Editar">
+              <span>✏️</span>
+            </button>
+            <button class="btn-delete" title="Eliminar">
+              <span>🗑️</span>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
+
+  <!-- Sin productos -->
+  @if (!getProductsVM.productsSignal().loading &&
+  !getProductsVM.productsSignal().error &&
+  getProductsVM.productsSignal().products.length === 0) {
+  <div class="empty-state">
+    <p>No hay productos en el inventario</p>
+    <button class="btn-add">Agregar primer producto</button>
+  </div>
+  }
+</div>
