@@ -1,0 +1,235 @@
+<div class="create-product-container">
+  <div class="header">
+    <h1>Crear Nuevo Producto</h1>
+    <button class="btn-back" (click)="onCancel()">
+      ← Volver al Inventario
+    </button>
+  </div>
+
+  @if (error()) {
+  <div class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <span>{{ error() }}</span>
+  </div>
+  }
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+    <div class="form-section">
+      <h2>Información Básica</h2>
+
+      <!-- Nombre del producto -->
+      <div class="form-group">
+        <label for="name"
+          >Nombre del Producto <span class="required">*</span></label
+        >
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          placeholder="Ej: Vitamina C 1000mg"
+          [class.invalid]="isFieldInvalid('name')"
+        />
+        @if (isFieldInvalid('name')) {
+        <span class="error-message">{{ getErrorMessage("name") }}</span>
+        }
+      </div>
+
+      <!-- Select de Laboratorio -->
+      <div class="form-group">
+        <label for="idLaboratory"
+          >Laboratorio <span class="required">*</span></label
+        >
+
+        @if (laboratoriesVM.state().loading) {
+        <div class="loading-select">
+          <span class="spinner-small"></span>
+          <span>Cargando laboratorios...</span>
+        </div>
+        } @else if (laboratoriesVM.state().error) {
+        <div class="error-select">
+          <span class="error-icon">⚠️</span>
+          <span>{{ laboratoriesVM.state().error }}</span>
+          <button
+            type="button"
+            class="btn-retry"
+            (click)="onRetryLoadLaboratories()"
+          >
+            Reintentar
+          </button>
+        </div>
+        } @else {
+        <select
+          id="idLaboratory"
+          formControlName="idLaboratory"
+          [class.invalid]="isFieldInvalid('idLaboratory')"
+        >
+          <option value="" disabled selected>Selecciona un laboratorio</option>
+          @for (lab of laboratoriesVM.state().laboratories; track lab.id) {
+          <option [value]="lab.id">{{ lab.name }}</option>
+          }
+        </select>
+        } @if (isFieldInvalid('idLaboratory')) {
+        <span class="error-message">{{ getErrorMessage("idLaboratory") }}</span>
+        }
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label for="description">Descripción</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          placeholder="Descripción del producto (opcional)"
+          rows="3"
+          [class.invalid]="isFieldInvalid('description')"
+        ></textarea>
+        @if (isFieldInvalid('description')) {
+        <span class="error-message">{{ getErrorMessage("description") }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- Toggle para agregar lote inicial -->
+    <div class="form-section">
+      <div class="section-toggle">
+        <label class="toggle-label">
+          <input
+            type="checkbox"
+            [checked]="showBatchFields()"
+            (change)="toggleBatchFields()"
+          />
+          <span>Agregar stock inicial (lote)</span>
+        </label>
+      </div>
+
+      @if (showBatchFields()) {
+      <div class="batch-fields">
+        <h3>Información del Lote</h3>
+
+        <div class="form-row">
+          <!-- Número de lote -->
+          <div class="form-group">
+            <label for="batchNumber"
+              >Número de Lote <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="batchNumber"
+              formControlName="batchNumber"
+              placeholder="Ej: LOTE-2024-001"
+              [class.invalid]="isFieldInvalid('batchNumber')"
+            />
+            @if (isFieldInvalid('batchNumber')) {
+            <span class="error-message">{{
+              getErrorMessage("batchNumber")
+            }}</span>
+            }
+          </div>
+
+          <!-- Fecha de vencimiento -->
+          <div class="form-group">
+            <label for="expirationDate"
+              >Fecha de Vencimiento <span class="required">*</span></label
+            >
+            <input
+              type="date"
+              id="expirationDate"
+              formControlName="expirationDate"
+              [class.invalid]="isFieldInvalid('expirationDate')"
+            />
+            @if (isFieldInvalid('expirationDate')) {
+            <span class="error-message">{{
+              getErrorMessage("expirationDate")
+            }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- Stock -->
+          <div class="form-group">
+            <label for="stock"
+              >Cantidad (Stock) <span class="required">*</span></label
+            >
+            <input
+              type="number"
+              id="stock"
+              formControlName="stock"
+              placeholder="0"
+              min="1"
+              [class.invalid]="isFieldInvalid('stock')"
+            />
+            @if (isFieldInvalid('stock')) {
+            <span class="error-message">{{ getErrorMessage("stock") }}</span>
+            }
+          </div>
+
+          <!-- Precio de compra -->
+          <!-- Precio de compra unitario -->
+          <div class="form-group">
+            <label for="unitPurchasePrice"
+              >Precio Unitario <span class="required">*</span></label
+            >
+            <input
+              type="number"
+              id="unitPurchasePrice"
+              formControlName="unitPurchasePrice"
+              placeholder="0"
+              min="1"
+              [class.invalid]="isFieldInvalid('unitPurchasePrice')"
+            />
+            <small class="field-hint">Precio por unidad en pesos</small>
+            @if (isFieldInvalid('unitPurchasePrice')) {
+            <span class="error-message">{{
+              getErrorMessage("unitPurchasePrice")
+            }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="totalPurchasePrice">Precio Total de Compra</label>
+            <input
+              type="text"
+              id="totalPurchasePrice"
+              [value]="getFormattedTotalPrice()"
+              readonly
+              class="readonly-field"
+            />
+            <small class="field-hint"
+              >Calculado automáticamente: Stock × Precio Unitario</small
+            >
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="onCancel()"
+        [disabled]="loading()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="
+          loading() || productForm.invalid || laboratoriesVM.state().loading
+        "
+      >
+        @if (loading()) {
+        <span class="spinner"></span>
+        <span>Creando...</span>
+        } @else {
+        <span>Crear Producto</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

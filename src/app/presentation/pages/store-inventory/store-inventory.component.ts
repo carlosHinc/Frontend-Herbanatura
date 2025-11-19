@@ -1,14 +1,16 @@
 import { Component, inject } from '@angular/core';
-import { GetProductsUseCase } from '../../application/use-cases/products/get-products.usecase';
-import { GetProductsGateway } from '../../domain/products/get-products.gateway';
-import { HttpGetProductsService } from '../../infrastructure/services/products/http-get-products.service';
 import { CommonModule } from '@angular/common';
-import { GetProductsViewModel } from '../view-models/products/get-productos.view-model';
+import { RouterLink } from '@angular/router';
+
+import { GetProductsGateway } from '@domain/products/get-products.gateway';
+import { GetProductsUseCase } from '@application/use-cases/products/get-products.usecase';
+import { HttpGetProductsService } from '@infrastructure/services/products/http-get-products.service';
+import { GetProductsViewModel } from '@presentation/view-models/products/get-productos.view-model';
 
 @Component({
   standalone: true,
   selector: 'app-store-inventory',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   providers: [
     GetProductsViewModel,
     GetProductsUseCase,

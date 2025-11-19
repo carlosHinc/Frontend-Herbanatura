@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { HttpCreateProductResponse } from './http-products.response';
 import { environment } from '../../../../enviroments/enviroment';
 import { CreateProduct } from '../../../domain/products/products.entity';
+import { ProductMapper } from './mappers/get-products.mapper';
 
 @Injectable()
 export class HttpCreateProductService implements CreateProductGateway {
@@ -18,16 +19,7 @@ export class HttpCreateProductService implements CreateProductGateway {
         createProduct
       )
       .pipe(
-        map((response) => {
-          return {
-            product: {
-              id: response.data.id,
-              name: response.data.name,
-              laboratory: response.data.laboratory,
-              stock: response.data.stock,
-            },
-          };
-        })
+        map((response) => ({ product: ProductMapper.fromHttp(response.data) }))
       );
   }
 }

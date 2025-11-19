@@ -6,7 +6,11 @@ export interface Product {
 }
 
 export interface CreateProduct {
-  name: number;
-  idLaboratory: string;
-  descripction: string;
+  name: string;
+  idLaboratory: number;
+  description?: string;
+  batchNumber?: string;
+  expirationDate?: string;
+  stock?: number;
+  unitPurchasePrice?: number;
 }
