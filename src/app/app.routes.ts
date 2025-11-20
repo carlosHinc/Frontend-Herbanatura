@@ -16,6 +16,13 @@ export const routes: Routes = [
       ).then((m) => m.CreateProductsComponent),
   },
   {
+    path: 'create-order',
+    loadComponent: () =>
+      import('./presentation/pages/create-order/create-order.component').then(
+        (m) => m.CreateOrderComponent
+      ),
+  },
+  {
     path: '',
     redirectTo: 'store-inventory',
     pathMatch: 'full',

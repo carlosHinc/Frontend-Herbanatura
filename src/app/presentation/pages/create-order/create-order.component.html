@@ -1,0 +1,250 @@
+<!-- Frontend/src/app/presentation/pages/create-order/create-order.component.html -->
+<div class="create-order-container">
+  <div class="header">
+    <h1>Crear Orden de Compra</h1>
+    <button class="btn-back" (click)="onCancel()">
+      ← Volver al Inventario
+    </button>
+  </div>
+
+  @if (error()) {
+  <div class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <span>{{ error() }}</span>
+  </div>
+  } @if (productsVM.productsSignal().error) {
+  <div class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <span>{{ productsVM.productsSignal().error }}</span>
+    <button class="btn-retry" (click)="onRetryLoadProducts()">
+      Reintentar cargar productos
+    </button>
+  </div>
+  }
+
+  <form [formGroup]="orderForm" (ngSubmit)="onSubmit()" class="order-form">
+    <!-- Sección de lotes -->
+    <div class="batches-section">
+      <div class="section-header">
+        <h2>Lotes de Productos</h2>
+        <button
+          type="button"
+          class="btn-add-batch"
+          (click)="addBatch()"
+          [disabled]="productsVM.productsSignal().loading"
+        >
+          + Agregar Lote
+        </button>
+      </div>
+
+      <div formArrayName="batches" class="batches-list">
+        @for (batch of batches.controls; track $index) {
+        <div [formGroupName]="$index" class="batch-card">
+          <div class="batch-header">
+            <h3>Lote #{{ $index + 1 }}</h3>
+            @if (batches.length > 1) {
+            <button
+              type="button"
+              class="btn-remove"
+              (click)="removeBatch($index)"
+              title="Eliminar lote"
+            >
+              🗑️
+            </button>
+            }
+          </div>
+
+          <div class="batch-form">
+            <!-- Producto -->
+            <div class="form-group">
+              <label [for]="'product-' + $index"
+                >Producto <span class="required">*</span></label
+              >
+
+              @if (productsVM.productsSignal().loading) {
+              <div class="loading-select">
+                <span class="spinner-small"></span>
+                <span>Cargando productos...</span>
+              </div>
+              } @else {
+              <select
+                [id]="'product-' + $index"
+                formControlName="idProduct"
+                [class.invalid]="isBatchFieldInvalid($index, 'idProduct')"
+              >
+                <option value="" disabled selected>
+                  Selecciona un producto
+                </option>
+                @for (product of productsVM.productsSignal().products; track
+                product.id) {
+                <option [value]="product.id">
+                  {{ product.name }} - {{ product.laboratory }}
+                </option>
+                }
+              </select>
+              } @if (isBatchFieldInvalid($index, 'idProduct')) {
+              <span class="error-message">{{
+                getErrorMessage("required")
+              }}</span>
+              }
+            </div>
+
+            <!-- Nombre del lote -->
+            <div class="form-group">
+              <label [for]="'batchName-' + $index"
+                >Nombre del Lote <span class="required">*</span></label
+              >
+              <input
+                type="text"
+                [id]="'batchName-' + $index"
+                formControlName="batchName"
+                placeholder="Ej: LOTE-2024-001"
+                [class.invalid]="isBatchFieldInvalid($index, 'batchName')"
+              />
+              @if (isBatchFieldInvalid($index, 'batchName')) {
+              <span class="error-message">{{
+                getErrorMessage("required")
+              }}</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <!-- Fecha de vencimiento -->
+              <div class="form-group">
+                <label [for]="'expirationDate-' + $index"
+                  >Fecha de Vencimiento <span class="required">*</span></label
+                >
+                <input
+                  type="date"
+                  [id]="'expirationDate-' + $index"
+                  formControlName="expirationDate"
+                  [class.invalid]="
+                    isBatchFieldInvalid($index, 'expirationDate')
+                  "
+                />
+                @if (isBatchFieldInvalid($index, 'expirationDate')) {
+                <span class="error-message">{{
+                  getErrorMessage("required")
+                }}</span>
+                }
+              </div>
+
+              <!-- Stock -->
+              <div class="form-group">
+                <label [for]="'stock-' + $index"
+                  >Cantidad <span class="required">*</span></label
+                >
+                <input
+                  type="number"
+                  [id]="'stock-' + $index"
+                  formControlName="stock"
+                  placeholder="0"
+                  min="1"
+                  [class.invalid]="isBatchFieldInvalid($index, 'stock')"
+                />
+                @if (isBatchFieldInvalid($index, 'stock')) {
+                <span class="error-message">{{ getErrorMessage("min") }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <!-- Precio unitario -->
+              <div class="form-group">
+                <label [for]="'unitPrice-' + $index"
+                  >Precio Unitario <span class="required">*</span></label
+                >
+                <input
+                  type="number"
+                  [id]="'unitPrice-' + $index"
+                  formControlName="unitPurchasePrice"
+                  placeholder="0"
+                  min="0"
+                  [class.invalid]="
+                    isBatchFieldInvalid($index, 'unitPurchasePrice')
+                  "
+                />
+                <small class="field-hint">Precio por unidad en pesos</small>
+                @if (isBatchFieldInvalid($index, 'unitPurchasePrice')) {
+                <span class="error-message">{{ getErrorMessage("min") }}</span>
+                }
+              </div>
+
+              <!-- Precio total (readonly) -->
+              <div class="form-group">
+                <label [for]="'totalPrice-' + $index">Precio Total</label>
+                <input
+                  type="text"
+                  [id]="'totalPrice-' + $index"
+                  [value]="getFormattedPrice(getBatchTotalPrice($index))"
+                  readonly
+                  class="readonly-field"
+                />
+                <small class="field-hint">Calculado automáticamente</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        } @if (batches.length === 0) {
+        <div class="empty-state">
+          <p>No hay lotes agregados</p>
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="addBatch()"
+            [disabled]="productsVM.productsSignal().loading"
+          >
+            + Agregar Primer Lote
+          </button>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Resumen del pedido -->
+    <div class="order-summary">
+      <h3>Resumen de la Orden</h3>
+      <div class="summary-content">
+        <div class="summary-item">
+          <span class="label">Total de Lotes:</span>
+          <span class="value">{{ batches.length }}</span>
+        </div>
+        <div class="summary-item total">
+          <span class="label">Valor Total:</span>
+          <span class="value">{{
+            getFormattedPrice(calculateOrderTotal())
+          }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="onCancel()"
+        [disabled]="loading()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="
+          loading() ||
+          orderForm.invalid ||
+          batches.length === 0 ||
+          productsVM.productsSignal().loading
+        "
+      >
+        @if (loading()) {
+        <span class="spinner"></span>
+        <span>Creando Orden...</span>
+        } @else {
+        <span>Crear Orden de Compra</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>
