@@ -1,4 +1,3 @@
-// Frontend/src/app/presentation/pages/create-order/create-order.component.ts
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -137,7 +136,7 @@ export class CreateOrderComponent implements OnInit {
       await this.vm.execute(orderData);
 
       // Redirigir después de crear la orden
-      this.router.navigate(['/store-inventory']);
+      this.router.navigate(['/inventario/productos']);
     } catch (error: any) {
       console.error('Error al crear orden:', error);
       this.error.set(
@@ -149,7 +148,7 @@ export class CreateOrderComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/store-inventory']);
+    this.router.navigate(['/inventario/productos']);
   }
 
   // Helpers para validaciones

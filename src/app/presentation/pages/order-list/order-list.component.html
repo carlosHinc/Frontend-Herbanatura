@@ -1,0 +1,70 @@
+<div class="orders-container">
+  <div class="header">
+    <h1>Lista de Pedidos</h1>
+    <a routerLink="/inventario/registrar-pedido" class="btn-add"
+      >+ Nuevo Pedido</a
+    >
+  </div>
+
+  <!-- Loading -->
+  @if (ordersVM.state().loading) {
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Cargando pedidos...</p>
+  </div>
+  }
+
+  <!-- Error -->
+  @if (ordersVM.state().error) {
+  <div class="error">
+    <span class="error-icon">⚠️</span>
+    <p>{{ ordersVM.state().error }}</p>
+    <button (click)="retry()" class="btn-retry">Reintentar</button>
+  </div>
+  }
+
+  <!-- Tabla de pedidos -->
+  @if (!ordersVM.state().loading && !ordersVM.state().error &&
+  ordersVM.state().orders.length > 0) {
+  <div class="table-container">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Valor Total</th>
+          <th>Ver Detalle</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of ordersVM.state().orders; track order.id) {
+        <tr>
+          <td class="order-id">#{{ order.id }}</td>
+          <td class="order-date">{{ formatDate(order.date) }}</td>
+          <td class="order-value">{{ formatCurrency(order.value) }}</td>
+          <td class="actions">
+            <button
+              (click)="goToDetail(order.id)"
+              class="btn-view"
+              title="Ver detalles"
+            >
+              <span>👁️</span>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
+
+  <!-- Sin pedidos -->
+  @if (!ordersVM.state().loading && !ordersVM.state().error &&
+  ordersVM.state().orders.length === 0) {
+  <div class="empty-state">
+    <span class="empty-icon">📦</span>
+    <p>No hay pedidos registrados</p>
+    <a routerLink="/create-order" class="btn-add">Crear primer pedido</a>
+  </div>
+  }
+</div>

@@ -1,0 +1,237 @@
+<div class="create-sale-container">
+  <div class="header">
+    <h1>Registrar Venta</h1>
+    <button class="btn-back" (click)="onCancel()">
+      ← Volver al Inventario
+    </button>
+  </div>
+
+  @if (error()) {
+  <div class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <span>{{ error() }}</span>
+  </div>
+  } @if (productsVM.state().error) {
+  <div class="alert alert-error">
+    <span class="alert-icon">⚠️</span>
+    <span>{{ productsVM.state().error }}</span>
+    <button class="btn-retry" (click)="onRetryLoadProducts()">
+      Reintentar cargar productos
+    </button>
+  </div>
+  }
+
+  <form [formGroup]="saleForm" (ngSubmit)="onSubmit()" class="sale-form">
+    <!-- Descripción de la venta -->
+    <div class="form-section">
+      <h2>Información de la Venta</h2>
+
+      <div class="form-group">
+        <label for="description"
+          >Descripción <span class="required">*</span></label
+        >
+        <input
+          type="text"
+          id="description"
+          formControlName="description"
+          placeholder="Ej: Venta mostrador - Cliente Juan Pérez"
+          [class.invalid]="isDescriptionInvalid()"
+        />
+        @if (isDescriptionInvalid()) {
+        <span class="error-message">{{ getDescriptionErrorMessage() }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- Sección de productos -->
+    <div class="products-section">
+      <div class="section-header">
+        <h2>Productos</h2>
+        <button
+          type="button"
+          class="btn-add-product"
+          (click)="addProduct()"
+          [disabled]="productsVM.state().loading"
+        >
+          + Agregar Producto
+        </button>
+      </div>
+
+      <div formArrayName="products" class="products-list">
+        @for (product of products.controls; track $index) {
+        <div [formGroupName]="$index" class="product-card">
+          <div class="product-header">
+            <h3>Producto #{{ $index + 1 }}</h3>
+            @if (products.length > 1) {
+            <button
+              type="button"
+              class="btn-remove"
+              (click)="removeProduct($index)"
+              title="Eliminar producto"
+            >
+              🗑️
+            </button>
+            }
+          </div>
+
+          <div class="product-form">
+            <!-- Selector de producto -->
+            <div class="form-group">
+              <label [for]="'product-' + $index"
+                >Producto <span class="required">*</span></label
+              >
+
+              @if (productsVM.state().loading) {
+              <div class="loading-select">
+                <span class="spinner-small"></span>
+                <span>Cargando productos...</span>
+              </div>
+              } @else {
+              <select
+                [id]="'product-' + $index"
+                formControlName="idProduct"
+                [class.invalid]="isProductFieldInvalid($index, 'idProduct')"
+              >
+                <option value="" disabled selected>
+                  Selecciona un producto
+                </option>
+                @for (prod of productsVM.state().products; track prod.id) {
+                <option [value]="prod.id">
+                  {{ prod.name }} - {{ prod.laboratory }}
+                </option>
+                }
+              </select>
+
+              @if (product.get('idProduct')?.value) {
+              <small class="field-hint stock-info">
+                Stock disponible:
+                {{ getAvailableStock(product.get("idProduct")?.value) }}
+                unidades
+              </small>
+              } } @if (isProductFieldInvalid($index, 'idProduct')) {
+              <span class="error-message">{{
+                getErrorMessage($index, "idProduct")
+              }}</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <!-- Cantidad -->
+              <div class="form-group">
+                <label [for]="'stock-' + $index"
+                  >Cantidad <span class="required">*</span></label
+                >
+                <input
+                  type="number"
+                  [id]="'stock-' + $index"
+                  formControlName="stock"
+                  placeholder="0"
+                  min="1"
+                  [class.invalid]="isProductFieldInvalid($index, 'stock')"
+                />
+                @if (isProductFieldInvalid($index, 'stock')) {
+                <span class="error-message">{{
+                  getErrorMessage($index, "stock")
+                }}</span>
+                }
+              </div>
+
+              <!-- Precio unitario (readonly) -->
+              <div class="form-group">
+                <label [for]="'unitPrice-' + $index">Precio Unitario</label>
+                <input
+                  type="text"
+                  [id]="'unitPrice-' + $index"
+                  [value]="
+                    getFormattedPrice(product.get('unitPrice')?.value || 0)
+                  "
+                  readonly
+                  class="readonly-field"
+                />
+                <small class="field-hint">Precio de venta del producto</small>
+              </div>
+
+              <!-- Total del producto (readonly) -->
+              <div class="form-group">
+                <label [for]="'total-' + $index">Total</label>
+                <input
+                  type="text"
+                  [id]="'total-' + $index"
+                  [value]="getFormattedPrice(getProductTotal($index))"
+                  readonly
+                  class="readonly-field"
+                />
+                <small class="field-hint">Calculado automáticamente</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        } @if (products.length === 0) {
+        <div class="empty-state">
+          <p>No hay productos agregados</p>
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="addProduct()"
+            [disabled]="productsVM.state().loading"
+          >
+            + Agregar Primer Producto
+          </button>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Resumen de la venta -->
+    <div class="sale-summary">
+      <h3>Resumen de la Venta</h3>
+      <div class="summary-content">
+        <div class="summary-item">
+          <span class="label">Total de Productos:</span>
+          <span class="value">{{ products.length }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Total de Unidades:</span>
+          <span class="value">
+            {{ getTotalUnits() }}
+          </span>
+        </div>
+        <div class="summary-item total">
+          <span class="label">Valor Total:</span>
+          <span class="value">{{
+            getFormattedPrice(calculateSaleTotal())
+          }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="onCancel()"
+        [disabled]="loading()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="
+          loading() ||
+          saleForm.invalid ||
+          products.length === 0 ||
+          productsVM.state().loading
+        "
+      >
+        @if (loading()) {
+        <span class="spinner"></span>
+        <span>Registrando Venta...</span>
+        } @else {
+        <span>Registrar Venta</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

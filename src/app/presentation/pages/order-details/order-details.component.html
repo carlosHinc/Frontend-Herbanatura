@@ -1,0 +1,137 @@
+<div class="order-details-container">
+  <div class="header">
+    <button class="btn-back" (click)="goBack()">← Volver a Pedidos</button>
+    <h1>Detalle del Pedido</h1>
+  </div>
+
+  <!-- Loading -->
+  @if (orderDetailsVM.state().loading) {
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Cargando detalles del pedido...</p>
+  </div>
+  }
+
+  <!-- Error -->
+  @if (orderDetailsVM.state().error) {
+  <div class="error">
+    <span class="error-icon">⚠️</span>
+    <p>{{ orderDetailsVM.state().error }}</p>
+    <button (click)="retry()" class="btn-retry">Reintentar</button>
+  </div>
+  }
+
+  <!-- Contenido del pedido -->
+  @if (!orderDetailsVM.state().loading && !orderDetailsVM.state().error &&
+  orderDetailsVM.state().orderDetails.orderDetails.details) {
+  <div class="order-content">
+    <!-- Información general del pedido -->
+    <div class="order-info-card">
+      <h2>Información General</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">ID del Pedido:</span>
+          <span class="value order-id"
+            >#{{
+              orderDetailsVM.state().orderDetails.orderDetails.order.id
+            }}</span
+          >
+        </div>
+        <div class="info-item">
+          <span class="label">Fecha:</span>
+          <span class="value">{{
+            formatDate(
+              orderDetailsVM.state().orderDetails.orderDetails.order.date
+            )
+          }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Valor Total:</span>
+          <span class="value total-value">{{
+            formatCurrency(
+              orderDetailsVM.state().orderDetails.orderDetails.order.value
+            )
+          }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="summary-card">
+      <h3>Resumen</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Total de Productos:</span>
+          <span class="summary-value">{{ getTotalProducts() }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Total de Unidades:</span>
+          <span class="summary-value">{{ getTotalUnits() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de detalles -->
+    <div class="details-section">
+      <h2>Detalles del Pedido</h2>
+
+      @if (orderDetailsVM.state().orderDetails.orderDetails.details.length > 0)
+      {
+      <div class="table-container">
+        <table class="details-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Laboratorio</th>
+              <th>Precio Unitario</th>
+              <th>Cantidad</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (detail of
+            orderDetailsVM.state().orderDetails.orderDetails.details; track
+            detail.id) {
+            <tr>
+              <td class="product-name">{{ detail.product }}</td>
+              <td class="laboratory">{{ detail.laboratory }}</td>
+              <td class="unit-price">{{ formatCurrency(detail.unitPrice) }}</td>
+              <td class="amount">
+                <span class="amount-badge">{{ detail.amount }} unidades</span>
+              </td>
+              <td class="total-price">
+                {{ formatCurrency(detail.totalPrice) }}
+              </td>
+            </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3"></td>
+              <td class="footer-label">Total:</td>
+              <td class="footer-total">
+                {{
+                  formatCurrency(
+                    orderDetailsVM.state().orderDetails.orderDetails.order.value
+                  )
+                }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      } @else {
+      <div class="empty-details">
+        <p>No hay detalles para mostrar en este pedido</p>
+      </div>
+      }
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions-section">
+      <button class="btn-secondary" (click)="goBack()">Volver</button>
+      <button class="btn-primary">Imprimir</button>
+    </div>
+  </div>
+  }
+</div>

@@ -33,3 +33,29 @@ export interface HttpCreateOrderResponse {
   message: string;
   data: HttpOrderData;
 }
+
+export interface HttpDataOrder {
+  id: number;
+  value: number;
+  created_at: string;
+}
+
+export interface HttpDataOrderDetails {
+  id: number;
+  product_name: string;
+  laboratory: string;
+  unit_price: number;
+  amount: number;
+  total_price: number;
+}
+
+export interface HttpGetOrdersResponse {
+  data: HttpDataOrder[];
+}
+
+export interface HttpGetOrderDetailsResponse {
+  data: {
+    bill: HttpDataOrder;
+    details: HttpDataOrderDetails[];
+  };
+}

@@ -53,6 +53,7 @@ export class CreateProductsComponent implements OnInit {
     name: ['', [Validators.required, Validators.maxLength(255)]],
     idLaboratory: ['', [Validators.required]],
     description: ['', [Validators.maxLength(500)]],
+    salesPrice: ['', [Validators.min(0)]],
     // Campos opcionales del lote - SIN validaciones iniciales
     batchNumber: [''],
     expirationDate: [''],
@@ -141,6 +142,9 @@ export class CreateProductsComponent implements OnInit {
         name: formValue.name.trim(),
         idLaboratory: parseInt(formValue.idLaboratory),
         description: formValue.description?.trim() || undefined,
+        salesPrice: formValue.salesPrice
+          ? parseInt(formValue.salesPrice)
+          : undefined,
       };
 
       // Agregar datos del lote solo si se proporcionan
@@ -194,7 +198,7 @@ export class CreateProductsComponent implements OnInit {
     }
 
     if (field?.hasError('min')) {
-      return 'El valor debe ser mayor a 0';
+      return 'El valor debe ser mayor o igual a 0';
     }
 
     return '';

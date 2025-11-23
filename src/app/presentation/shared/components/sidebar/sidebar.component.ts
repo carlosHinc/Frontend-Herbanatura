@@ -1,30 +1,39 @@
-import { Component, computed, effect, ElementRef, HostListener, inject, OnInit, ViewChild, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  HostListener,
+  inject,
+  OnInit,
+  ViewChild,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MenuService } from '../../services/menu.service';
-import { MenuItem } from '../../interfaces/menu.interface';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss'
+  styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent implements OnInit {
   @ViewChild('sidebar', { static: true }) sidebar!: ElementRef;
 
   private menuService = inject(MenuService);
-  
+
   // Computed properties para reactive updates
   isCollapsed = this.menuService.isCollapsed;
   openSubmenu = this.menuService.openSubmenu;
   menuItems = computed(() => this.menuService.getMenuItems());
-  
+
   // Signals para manejo móvil
   private _showMobileSidebar = signal(false);
   private _isMobile = signal(false);
-  
+
   showMobileSidebar = this._showMobileSidebar.asReadonly();
   isMobile = this._isMobile.asReadonly();
 
@@ -63,7 +72,7 @@ export class SidebarComponent implements OnInit {
       const target = event.target as HTMLElement;
       const isToggleButton = target.closest('.mobile-toggle');
       const isSidebar = target.closest('.sidebar');
-      
+
       if (!isToggleButton && !isSidebar) {
         this.hideMobileSidebar();
       }
@@ -80,7 +89,7 @@ export class SidebarComponent implements OnInit {
   private checkScreenSize(): void {
     const isMobile = window.innerWidth <= 768;
     this._isMobile.set(isMobile);
-    
+
     if (!isMobile) {
       this._showMobileSidebar.set(false);
     }
@@ -88,7 +97,7 @@ export class SidebarComponent implements OnInit {
 
   toggleSidebar(): void {
     console.log('Toggle sidebar called, isMobile:', this._isMobile());
-    
+
     if (this._isMobile()) {
       const newState = !this._showMobileSidebar();
       this._showMobileSidebar.set(newState);
@@ -121,15 +130,15 @@ export class SidebarComponent implements OnInit {
 
   getSidebarClasses(): string {
     let classes = 'sidebar';
-    
+
     if (!this._isMobile() && this.isCollapsed()) {
       classes += ' collapsed';
     }
-    
+
     if (this._isMobile() && this._showMobileSidebar()) {
       classes += ' show-mobile';
     }
-    
+
     return classes;
   }
 }

@@ -3,6 +3,7 @@ export interface HttpProductData {
   name: string;
   laboratory: string;
   stock: number;
+  sales_price: number;
 }
 
 export interface HttpGetProductsResponse {

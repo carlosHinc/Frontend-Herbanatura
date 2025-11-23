@@ -8,6 +8,7 @@ export class ProductMapper {
       name: httpProductData.name,
       laboratory: httpProductData.laboratory,
       stock: httpProductData.stock,
+      salesPrice: httpProductData.sales_price,
     };
   }
 }

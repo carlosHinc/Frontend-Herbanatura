@@ -1,7 +1,9 @@
 <div class="inventory-container">
   <div class="header">
     <h1>Inventario de Productos</h1>
-    <a routerLink="/create-product" class="btn-add">+ Agregar Producto</a>
+    <a routerLink="/inventario/crear-producto" class="btn-add"
+      >+ Agregar Producto</a
+    >
   </div>
 
   <!-- Loading -->
@@ -29,6 +31,7 @@
         <tr>
           <th>Nombre</th>
           <th>Laboratorio</th>
+          <th>Precio de Venta</th>
           <th>Stock</th>
           <th>Acciones</th>
         </tr>
@@ -39,6 +42,11 @@
         <tr>
           <td class="product-name">{{ product.name }}</td>
           <td class="laboratory">{{ product.laboratory }}</td>
+          <td class="price">
+            {{
+              product.salesPrice | currency : "COP" : "symbol-narrow" : "1.0-0"
+            }}
+          </td>
           <td>
             <span class="stock-badge" [class.low-stock]="product.stock < 10">
               {{ product.stock }}
