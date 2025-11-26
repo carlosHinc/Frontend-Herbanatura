@@ -1,10 +1,9 @@
 <div class="inventory-container">
-  <div class="header">
-    <h1>Inventario de Productos</h1>
-    <a routerLink="/inventario/crear-producto" class="btn-add"
-      >+ Agregar Producto</a
-    >
-  </div>
+  <ds-header
+    [configH1]="h1Config"
+    [configButton]="addButtonConfig"
+    (buttonEvent)="goToAddProduct()"
+  />
 
   <!-- Loading -->
   @if (getProductsVM.productsSignal().loading) {

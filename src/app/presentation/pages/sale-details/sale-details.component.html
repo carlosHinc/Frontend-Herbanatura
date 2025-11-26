@@ -1,0 +1,136 @@
+<div class="sale-details-container">
+  <div class="header">
+    <button class="btn-back" (click)="goBack()">← Volver a Ventas</button>
+    <h1>Detalle de la Venta</h1>
+  </div>
+
+  <!-- Loading -->
+  @if (saleDetailsVM.state().loading) {
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Cargando detalles de la venta...</p>
+  </div>
+  }
+
+  <!-- Error -->
+  @if (saleDetailsVM.state().error) {
+  <div class="error">
+    <span class="error-icon">⚠️</span>
+    <p>{{ saleDetailsVM.state().error }}</p>
+    <button (click)="retry()" class="btn-retry">Reintentar</button>
+  </div>
+  }
+
+  <!-- Contenido de la venta -->
+  @if (!saleDetailsVM.state().loading && !saleDetailsVM.state().error &&
+  saleDetailsVM.state().saleDetails.saleDetails.details) {
+  <div class="sale-content">
+    <!-- Información general de la venta -->
+    <div class="sale-info-card">
+      <h2>Información General</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">ID de la Venta:</span>
+          <span class="value sale-id"
+            >#{{ saleDetailsVM.state().saleDetails.saleDetails.sale.id }}</span
+          >
+        </div>
+        <div class="info-item">
+          <span class="label">Fecha:</span>
+          <span class="value">{{
+            formatDate(saleDetailsVM.state().saleDetails.saleDetails.sale.date)
+          }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Valor Total:</span>
+          <span class="value total-value">{{
+            formatCurrency(
+              saleDetailsVM.state().saleDetails.saleDetails.sale.value
+            )
+          }}</span>
+        </div>
+      </div>
+      <div class="description-section">
+        <span class="label">Descripción:</span>
+        <p class="description-text">
+          {{ saleDetailsVM.state().saleDetails.saleDetails.sale.description }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="summary-card">
+      <h3>Resumen</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Total de Productos:</span>
+          <span class="summary-value">{{ getTotalProducts() }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Total de Unidades:</span>
+          <span class="summary-value">{{ getTotalUnits() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de detalles -->
+    <div class="details-section">
+      <h2>Productos Vendidos</h2>
+
+      @if (saleDetailsVM.state().saleDetails.saleDetails.details.length > 0) {
+      <div class="table-container">
+        <table class="details-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Precio Unitario</th>
+              <th>Cantidad</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (detail of
+            saleDetailsVM.state().saleDetails.saleDetails.details; track
+            detail.id) {
+            <tr>
+              <td class="product-name">{{ detail.productName }}</td>
+              <td class="unit-price">{{ formatCurrency(detail.unitPrice) }}</td>
+              <td class="amount">
+                <span class="amount-badge">{{ detail.stock }} unidades</span>
+              </td>
+              <td class="total-price">
+                {{ formatCurrency(detail.totalPrice) }}
+              </td>
+            </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2"></td>
+              <td class="footer-label">Total:</td>
+              <td class="footer-total">
+                {{
+                  formatCurrency(
+                    saleDetailsVM.state().saleDetails.saleDetails.sale.value
+                  )
+                }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      } @else {
+      <div class="empty-details">
+        <p>No hay detalles para mostrar en esta venta</p>
+      </div>
+      }
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions-section">
+      <button class="btn-secondary" (click)="goBack()">Volver</button>
+      <button class="btn-primary">Imprimir</button>
+    </div>
+  </div>
+  }
+</div>

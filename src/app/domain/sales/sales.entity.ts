@@ -3,7 +3,17 @@ export interface Sale {
   value: number;
   date: string;
   description: string;
-  createdAt: string;
+}
+
+export interface SaleDetail {
+  id: number;
+  idSale: number;
+  idProduct: number;
+  productName: string;
+  laboratory: string;
+  unitPrice: number;
+  stock: number;
+  totalPrice: number;
 }
 
 export interface ProductDataForSale {

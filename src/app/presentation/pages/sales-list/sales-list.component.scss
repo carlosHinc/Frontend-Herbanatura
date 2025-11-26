@@ -1,0 +1,266 @@
+.sales-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      color: #333;
+      margin: 0;
+    }
+
+    .btn-add {
+      background-color: #4caf50;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background-color 0.3s;
+      display: inline-block;
+
+      &:hover {
+        background-color: #45a049;
+      }
+    }
+  }
+
+  .loading {
+    text-align: center;
+    padding: 4rem;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e0e0e0;
+      border-top-color: #2196f3;
+      border-radius: 50%;
+      margin: 0 auto 1.5rem;
+      animation: spin 0.8s linear infinite;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  .error {
+    text-align: center;
+    padding: 3rem;
+    background-color: #ffebee;
+    border-radius: 8px;
+    border: 1px solid #f44336;
+
+    .error-icon {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #c62828;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-retry {
+      background-color: #2196f3;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #0b7dda;
+      }
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    border: 2px dashed #ddd;
+
+    .empty-icon {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-add {
+      background-color: #4caf50;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #45a049;
+      }
+    }
+  }
+
+  .table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .sales-table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        background-color: #f5f5f5;
+
+        tr {
+          th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e0e0e0;
+
+            &:last-child {
+              text-align: center;
+            }
+          }
+        }
+      }
+
+      tbody {
+        tr {
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: #f9f9f9;
+          }
+
+          &:not(:last-child) {
+            border-bottom: 1px solid #e0e0e0;
+          }
+
+          td {
+            padding: 1rem;
+            color: #666;
+            font-size: 0.95rem;
+
+            &.sale-id {
+              font-weight: 700;
+              color: #2196f3;
+              font-size: 1rem;
+            }
+
+            &.sale-description {
+              color: #333;
+              max-width: 300px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+
+            &.sale-date {
+              color: #666;
+            }
+
+            &.sale-value {
+              font-weight: 600;
+              color: #2e7d32;
+              font-size: 1rem;
+            }
+
+            &.actions {
+              text-align: center;
+
+              button {
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 1.2rem;
+                padding: 0.25rem 0.5rem;
+                margin: 0 0.25rem;
+                transition: transform 0.2s;
+
+                &:hover {
+                  transform: scale(1.2);
+                }
+
+                &.btn-view {
+                  color: #9c27b0;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .btn-add {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    .table-container {
+      overflow-x: auto;
+
+      .sales-table {
+        min-width: 700px;
+      }
+    }
+  }
+}

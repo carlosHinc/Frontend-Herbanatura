@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { SalesListComponent } from './presentation/pages/sales-list/sales-list.component';
 
 export const routes: Routes = [
   {
@@ -45,6 +46,25 @@ export const routes: Routes = [
           import(
             './presentation/pages/order-details/order-details.component'
           ).then((m) => m.OrderDetailsComponent),
+      },
+    ],
+  },
+  {
+    path: 'ventas',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./presentation/pages/sales-list/sales-list.component').then(
+            (m) => m.SalesListComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import(
+            './presentation/pages/sale-details/sale-details.component'
+          ).then((m) => m.SaleDetailsComponent),
       },
     ],
   },

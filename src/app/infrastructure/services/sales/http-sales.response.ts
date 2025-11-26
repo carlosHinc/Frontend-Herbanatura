@@ -3,16 +3,17 @@ export interface HttpSale {
   value: number;
   date: string;
   description: string;
-  createdAt: string;
 }
 
-interface HttSaleDetail {
+export interface HttSaleDetail {
   id: number;
   id_sale: number;
   id_product: number;
-  unit_value: number;
+  product_name: string;
+  laboratory: string;
+  unit_price: number;
   stock: number;
-  unit_total: number;
+  total_price: number;
 }
 
 interface HttSummary {
@@ -31,4 +32,15 @@ export interface HttpCreateSaleResponse {
   success: boolean;
   message: string;
   data: HttDataResponse;
+}
+
+export interface HttpGetSalesResponse {
+  data: HttpSale[];
+}
+
+export interface HttpGetSaleDetailsResponse {
+  data: {
+    sale: HttpSale;
+    details: HttSaleDetail[];
+  };
 }

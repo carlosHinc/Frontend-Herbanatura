@@ -1,0 +1,70 @@
+<div class="sales-container">
+  <div class="header">
+    <h1>Lista de Ventas</h1>
+    <a routerLink="/registro-venta" class="btn-add">+ Nueva Venta</a>
+  </div>
+
+  <!-- Loading -->
+  @if (salesVM.state().loading) {
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Cargando ventas...</p>
+  </div>
+  }
+
+  <!-- Error -->
+  @if (salesVM.state().error) {
+  <div class="error">
+    <span class="error-icon">⚠️</span>
+    <p>{{ salesVM.state().error }}</p>
+    <button (click)="retry()" class="btn-retry">Reintentar</button>
+  </div>
+  }
+
+  <!-- Tabla de ventas -->
+  @if (!salesVM.state().loading && !salesVM.state().error &&
+  salesVM.state().sales.length > 0) {
+  <div class="table-container">
+    <table class="sales-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Descripción</th>
+          <th>Fecha</th>
+          <th>Valor Total</th>
+          <th>Ver Detalle</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (sale of salesVM.state().sales; track sale.id) {
+        <tr>
+          <td class="sale-id">#{{ sale.id }}</td>
+          <td class="sale-description">{{ sale.description }}</td>
+          <td class="sale-date">{{ formatDate(sale.date) }}</td>
+          <td class="sale-value">{{ formatCurrency(sale.value) }}</td>
+          <td class="actions">
+            <button
+              (click)="goToDetail(sale.id)"
+              class="btn-view"
+              title="Ver detalles"
+            >
+              <span>👁️</span>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
+
+  <!-- Sin ventas -->
+  @if (!salesVM.state().loading && !salesVM.state().error &&
+  salesVM.state().sales.length === 0) {
+  <div class="empty-state">
+    <span class="empty-icon">💰</span>
+    <p>No hay ventas registradas</p>
+    <a routerLink="/registro-venta" class="btn-add">Registrar primera venta</a>
+  </div>
+  }
+</div>
