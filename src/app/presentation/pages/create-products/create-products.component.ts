@@ -16,6 +16,10 @@ import { GetLaboratoriesViewModel } from '@presentation/view-models/laboratories
 import { GetLaboratoriesUseCase } from '@application/use-cases/laboratories/get-laboratories.usecase';
 import { GetLaboratoriesGateway } from '@domain/laboratories/get-laboratories.gateway';
 import { HttpGetLaboratoriesService } from '@infrastructure/services/laboratories/http-get-laboratories.service';
+import { CreateLaboratoryViewModel } from '@presentation/view-models/laboratories/create-laboratory.view-model';
+import { CreateLaboratoryUseCase } from '@application/use-cases/laboratories/creat-laboratory.usecase';
+import { CreateLaboratoryGateway } from '@domain/laboratories/create-laboratory.gateway';
+import { HttpCreateLaboratoryService } from '@infrastructure/services/laboratories/http-create-laboratory.service';
 
 @Component({
   selector: 'app-create-products',
@@ -34,6 +38,12 @@ import { HttpGetLaboratoriesService } from '@infrastructure/services/laboratorie
       provide: GetLaboratoriesGateway,
       useClass: HttpGetLaboratoriesService,
     },
+    CreateLaboratoryViewModel,
+    CreateLaboratoryUseCase,
+    {
+      provide: CreateLaboratoryGateway,
+      useClass: HttpCreateLaboratoryService,
+    },
   ],
   templateUrl: './create-products.component.html',
   styleUrl: './create-products.component.scss',
@@ -43,18 +53,46 @@ export class CreateProductsComponent implements OnInit {
   private readonly router = inject(Router);
   protected readonly vm = inject(CreateProductViewModel);
   protected readonly laboratoriesVM = inject(GetLaboratoriesViewModel);
+  protected readonly createLaboratoryVM = inject(CreateLaboratoryViewModel);
 
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly showBatchFields = signal(false);
   protected readonly totalPurchasePrice = signal(0);
 
+  // Nuevos signals para el modal de crear laboratorio
+  protected readonly showLaboratoryModal = signal(false);
+  protected readonly loadingLaboratory = signal(false);
+  protected readonly laboratoryError = signal<string | null>(null);
+  protected readonly newLaboratoryName = signal('');
+
+  // Agregar este signal junto con los otros signals
+  protected readonly showToast = signal(false);
+  protected readonly toastMessage = signal('');
+  protected readonly toastType = signal<'success' | 'error' | 'info'>(
+    'success'
+  );
+
+  // Método para mostrar toast
+  private showToastNotification(
+    message: string,
+    type: 'success' | 'error' | 'info' = 'success'
+  ): void {
+    this.toastMessage.set(message);
+    this.toastType.set(type);
+    this.showToast.set(true);
+
+    // Auto-ocultar después de 3 segundos
+    setTimeout(() => {
+      this.showToast.set(false);
+    }, 3000);
+  }
+
   protected readonly productForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(255)]],
     idLaboratory: ['', [Validators.required]],
     description: ['', [Validators.maxLength(500)]],
     salesPrice: ['', [Validators.min(0)]],
-    // Campos opcionales del lote - SIN validaciones iniciales
     batchNumber: [''],
     expirationDate: [''],
     stock: [0],
@@ -62,10 +100,8 @@ export class CreateProductsComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    // Cargar laboratorios al iniciar el componente
     this.laboratoriesVM.getLaboratories();
 
-    // Escuchar cambios en stock y precio unitario para recalcular el total
     this.productForm.get('stock')?.valueChanges.subscribe(() => {
       this.calculateTotalPrice();
     });
@@ -91,7 +127,6 @@ export class CreateProductsComponent implements OnInit {
     const unitPurchasePriceControl = this.productForm.get('unitPurchasePrice');
 
     if (this.showBatchFields()) {
-      // Agregar validaciones cuando se activa el checkbox
       batchNumberControl?.setValidators([Validators.required]);
       expirationDateControl?.setValidators([Validators.required]);
       stockControl?.setValidators([Validators.required, Validators.min(1)]);
@@ -100,13 +135,11 @@ export class CreateProductsComponent implements OnInit {
         Validators.min(1),
       ]);
     } else {
-      // Remover validaciones cuando se desactiva el checkbox
       batchNumberControl?.clearValidators();
       expirationDateControl?.clearValidators();
       stockControl?.clearValidators();
       unitPurchasePriceControl?.clearValidators();
 
-      // Limpiar campos del lote
       this.productForm.patchValue({
         batchNumber: '',
         expirationDate: '',
@@ -114,15 +147,67 @@ export class CreateProductsComponent implements OnInit {
         unitPurchasePrice: 0,
       });
 
-      // Resetear el precio total
       this.totalPurchasePrice.set(0);
     }
 
-    // Actualizar el estado de validación de los controles
     batchNumberControl?.updateValueAndValidity();
     expirationDateControl?.updateValueAndValidity();
     stockControl?.updateValueAndValidity();
     unitPurchasePriceControl?.updateValueAndValidity();
+  }
+
+  // Métodos para el modal de crear laboratorio
+  openLaboratoryModal(): void {
+    this.showLaboratoryModal.set(true);
+    this.laboratoryError.set(null);
+    this.newLaboratoryName.set('');
+  }
+
+  closeLaboratoryModal(): void {
+    this.showLaboratoryModal.set(false);
+    this.newLaboratoryName.set('');
+    this.laboratoryError.set(null);
+  }
+
+  async createLaboratory(): Promise<void> {
+    const name = this.newLaboratoryName().trim();
+
+    if (!name) {
+      this.laboratoryError.set('El nombre del laboratorio es obligatorio');
+      return;
+    }
+
+    this.loadingLaboratory.set(true);
+    this.laboratoryError.set(null);
+
+    try {
+      const result = await this.createLaboratoryVM.execute({ name });
+
+      // Recargar la lista de laboratorios
+      await this.laboratoriesVM.getLaboratories();
+
+      // Seleccionar automáticamente el laboratorio recién creado
+      this.productForm.patchValue({
+        idLaboratory: result.id,
+      });
+
+      // Mostrar toast de éxito
+      this.showToastNotification(
+        `Laboratorio "${name}" creado exitosamente`,
+        'success'
+      );
+
+      // Cerrar el modal
+      this.closeLaboratoryModal();
+    } catch (error: any) {
+      console.error('Error al crear laboratorio:', error);
+      this.laboratoryError.set(
+        error.message ||
+          'Error al crear el laboratorio. Por favor, intenta de nuevo.'
+      );
+    } finally {
+      this.loadingLaboratory.set(false);
+    }
   }
 
   async onSubmit(): Promise<void> {
@@ -137,7 +222,6 @@ export class CreateProductsComponent implements OnInit {
     try {
       const formValue = this.productForm.value;
 
-      // Preparar datos del producto
       const productData: any = {
         name: formValue.name.trim(),
         idLaboratory: parseInt(formValue.idLaboratory),
@@ -147,7 +231,6 @@ export class CreateProductsComponent implements OnInit {
           : undefined,
       };
 
-      // Agregar datos del lote solo si se proporcionan
       if (this.showBatchFields() && formValue.batchNumber) {
         productData.batchNumber = formValue.batchNumber.trim();
         productData.expirationDate = formValue.expirationDate;
@@ -158,8 +241,7 @@ export class CreateProductsComponent implements OnInit {
 
       await this.vm.execute(productData);
 
-      // Redirigir al inventario después de crear
-      this.router.navigate(['/store-inventory']);
+      this.router.navigate(['/inventario/productos']);
     } catch (error: any) {
       console.error('Error al crear producto:', error);
       this.error.set(
@@ -172,14 +254,13 @@ export class CreateProductsComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/store-inventory']);
+    this.router.navigate(['/inventario/productos']);
   }
 
   onRetryLoadLaboratories(): void {
     this.laboratoriesVM.getLaboratories();
   }
 
-  // Helpers para validaciones
   isFieldInvalid(fieldName: string): boolean {
     const field = this.productForm.get(fieldName);
     return !!(field?.invalid && (field?.touched || field?.dirty));
@@ -204,7 +285,6 @@ export class CreateProductsComponent implements OnInit {
     return '';
   }
 
-  // Formatear el precio total para mostrar
   getFormattedTotalPrice(): string {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
