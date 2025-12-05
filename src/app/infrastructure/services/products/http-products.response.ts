@@ -1,3 +1,21 @@
+interface HttpBatchExpiring {
+  batchId: number;
+  batchName: string;
+  expirationDate: string;
+  stock: number;
+  entryDate: string;
+  daysToExpire: number;
+}
+
+export interface HttpDataProductExpiring {
+  productId: number;
+  productName: string;
+  laboratory: string;
+  salesPrice: number;
+  totalStock: number;
+  batches: HttpBatchExpiring[];
+}
+
 export interface HttpProductData {
   id: number;
   name: string;
@@ -12,4 +30,8 @@ export interface HttpGetProductsResponse {
 
 export interface HttpCreateProductResponse {
   data: HttpProductData;
+}
+
+export interface HttpGetProductsExpiringResponse {
+  data: HttpDataProductExpiring[];
 }

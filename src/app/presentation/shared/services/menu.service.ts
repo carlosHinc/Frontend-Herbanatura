@@ -36,6 +36,12 @@ export class MenuService {
           route: '/inventario/registrar-pedido',
           badgeColor: 'warning',
         },
+        {
+          title: 'Consultar Productos A Vencer',
+          icon: 'bi-calendar-date',
+          route: '/inventario/proximos-a-vencer',
+          badgeColor: 'warning',
+        },
       ],
     },
     {

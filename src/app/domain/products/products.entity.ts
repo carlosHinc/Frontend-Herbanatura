@@ -16,3 +16,15 @@ export interface CreateProduct {
   stock?: number;
   unitPurchasePrice?: number;
 }
+
+export interface InventoryProductsCloseToExpiring {
+  purchaseDate: string;
+  expirationDate: string;
+  stock: number;
+  daysToExpire: number;
+}
+
+export interface ProductsCloseToExpiring {
+  product: Product;
+  inventory: InventoryProductsCloseToExpiring[];
+}

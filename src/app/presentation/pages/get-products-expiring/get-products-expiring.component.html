@@ -1,0 +1,149 @@
+<div class="expiring-products-container">
+  <div class="header">
+    <h1>Productos Próximos a Vencer</h1>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="daysInput">Días próximos a vencer:</label>
+      <div class="input-with-button">
+        <input
+          type="number"
+          id="daysInput"
+          [value]="daysFilter()"
+          (change)="onDaysChange($event)"
+          min="1"
+          placeholder="Ej: 30"
+        />
+        <button class="btn-search" (click)="loadProducts()">Buscar</button>
+      </div>
+    </div>
+
+    <div class="quick-filters">
+      <span class="quick-filters-label">Filtros rápidos:</span>
+      @for (days of quickFilters; track days) {
+      <button
+        class="btn-quick-filter"
+        [class.active]="daysFilter() === days"
+        (click)="setQuickFilter(days)"
+      >
+        {{ days }} días
+      </button>
+      }
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (productsExpiringVM.state().loading) {
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Cargando productos próximos a vencer...</p>
+  </div>
+  }
+
+  <!-- Error -->
+  @if (productsExpiringVM.state().error) {
+  <div class="error">
+    <span class="error-icon">⚠️</span>
+    <p>{{ productsExpiringVM.state().error }}</p>
+    <button (click)="retry()" class="btn-retry">Reintentar</button>
+  </div>
+  }
+
+  <!-- Resumen -->
+  @if (!productsExpiringVM.state().loading && !productsExpiringVM.state().error
+  && productsExpiringVM.state().products.length > 0) {
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="summary-icon">📦</div>
+      <div class="summary-content">
+        <span class="summary-label">Total Productos</span>
+        <span class="summary-value">{{ getTotalProducts() }}</span>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon">📊</div>
+      <div class="summary-content">
+        <span class="summary-label">Total Lotes</span>
+        <span class="summary-value">{{ getTotalBatches() }}</span>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon">🔢</div>
+      <div class="summary-content">
+        <span class="summary-label">Stock Total</span>
+        <span class="summary-value">{{ getTotalStock() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de productos -->
+  <div class="products-list">
+    @for (item of productsExpiringVM.state().products; track item.product.id) {
+    <div class="product-card">
+      <div class="product-header">
+        <div class="product-info">
+          <h3>{{ item.product.name }}</h3>
+          <span class="laboratory">{{ item.product.laboratory }}</span>
+        </div>
+        <div class="product-stock">
+          <span class="stock-label">Stock Total:</span>
+          <span class="stock-value">{{ item.product.stock }} unidades</span>
+        </div>
+      </div>
+
+      <div class="batches-section">
+        <h4>Lotes ({{ item.inventory.length }})</h4>
+        <div class="batches-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha de Vencimiento</th>
+                <th>Stock</th>
+                <th>Días Restantes</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (batch of item.inventory; track batch.expirationDate) {
+              <tr>
+                <td class="expiration-date">
+                  {{ formatDate(batch.expirationDate) }}
+                </td>
+                <td class="stock">{{ batch.stock }} unidades</td>
+                <td class="days">{{ batch.daysToExpire }} días</td>
+                <td>
+                  <span
+                    class="status-badge"
+                    [class]="getExpirationClass(batch.daysToExpire)"
+                  >
+                    @if (batch.daysToExpire <= 7) { 🔴 Crítico } @else if
+                    (batch.daysToExpire <= 30) { 🟡 Atención } @else { 🟢 Normal
+                    }
+                  </span>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Estado vacío -->
+  @if (!productsExpiringVM.state().loading && !productsExpiringVM.state().error
+  && productsExpiringVM.state().products.length === 0) {
+  <div class="empty-state">
+    <span class="empty-icon">✅</span>
+    <h2>No hay productos próximos a vencer</h2>
+    <p>
+      No se encontraron productos que venzan en los próximos
+      {{ daysFilter() }} días
+    </p>
+  </div>
+  }
+</div>
