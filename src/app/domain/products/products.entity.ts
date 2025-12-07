@@ -4,6 +4,8 @@ export interface Product {
   laboratory: string;
   stock: number;
   salesPrice: number;
+  idLaboratory?: number;
+  description?: string;
 }
 
 export interface CreateProduct {
@@ -15,6 +17,13 @@ export interface CreateProduct {
   expirationDate?: string;
   stock?: number;
   unitPurchasePrice?: number;
+}
+
+export interface UpdateProduct {
+  idLaboratory?: number;
+  name?: string;
+  description?: string;
+  salesPrice?: number;
 }
 
 export interface InventoryProductsCloseToExpiring {

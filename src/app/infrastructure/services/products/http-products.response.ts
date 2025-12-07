@@ -22,6 +22,8 @@ export interface HttpProductData {
   laboratory: string;
   stock: number;
   sales_price: number;
+  id_laboratory?: number;
+  description?: string;
 }
 
 export interface HttpGetProductsResponse {
@@ -32,6 +34,18 @@ export interface HttpCreateProductResponse {
   data: HttpProductData;
 }
 
+export interface HttpUpdateProductResponse {
+  data: HttpProductData;
+}
+
+export interface HttpUpdateProductResponse {
+  data: HttpProductData;
+}
+
 export interface HttpGetProductsExpiringResponse {
   data: HttpDataProductExpiring[];
+}
+
+export interface HttpGetProductResponse {
+  data: HttpProductData;
 }

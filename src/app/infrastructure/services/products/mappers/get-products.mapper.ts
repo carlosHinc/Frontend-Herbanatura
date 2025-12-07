@@ -15,6 +15,7 @@ export class ProductMapper {
       laboratory: httpProductData.laboratory,
       stock: httpProductData.stock,
       salesPrice: httpProductData.sales_price,
+      description: httpProductData.description || undefined,
     };
   }
 
@@ -35,6 +36,19 @@ export class ProductMapper {
         stock: batch.stock,
         daysToExpire: batch.daysToExpire,
       })),
+    };
+  }
+
+  static fromHttpGetProduct(httpProductData: HttpProductData): Product {
+    console.log('fromHttpGetProduct httpProductData', httpProductData);
+    return {
+      id: httpProductData.id,
+      name: httpProductData.name,
+      laboratory: httpProductData.laboratory,
+      stock: httpProductData.stock,
+      salesPrice: httpProductData.sales_price,
+      idLaboratory: httpProductData.id_laboratory,
+      description: httpProductData.description,
     };
   }
 }

@@ -11,3 +11,11 @@ export interface CreateProductResponse {
 export interface GetProductsExpiringResponse {
   products: ProductsCloseToExpiring[];
 }
+
+export interface GetProductResponse {
+  product: Product;
+}
+
+export interface UpdateProductResponse {
+  product: Product;
+}

@@ -1,0 +1,175 @@
+<div class="update-product-container">
+  <div class="header">
+    <h1>Editar Producto</h1>
+  </div>
+
+  <!-- Loading inicial -->
+  @if (loadingProduct()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando información del producto...</p>
+  </div>
+  }
+
+  <!-- Error al cargar producto -->
+  @if (!loadingProduct() && error() && !getProductVM.state().product) {
+  <div class="error-load">
+    <span class="error-icon">⚠️</span>
+    <p>{{ error() }}</p>
+    <div class="error-actions">
+      <button class="btn-retry" (click)="onRetryLoadProduct()">
+        Reintentar
+      </button>
+      <button class="btn-secondary" (click)="onCancel()">
+        Volver al listado
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Formulario -->
+  @if (!loadingProduct() && getProductVM.state().product) {
+  <div class="form-container">
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+      <!-- Nombre del Producto -->
+      <div class="form-group">
+        <label for="name"
+          >Nombre del Producto <span class="required">*</span></label
+        >
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          placeholder="Ej: Paracetamol 500mg"
+          [class.invalid]="isFieldInvalid('name')"
+        />
+        @if (isFieldInvalid('name')) {
+        <span class="error-message">{{ getErrorMessage("name") }}</span>
+        }
+      </div>
+
+      <!-- Select de Laboratorio -->
+      <div class="form-group">
+        <label for="idLaboratory"
+          >Laboratorio <span class="required">*</span></label
+        >
+
+        @if (laboratoriesVM.state().loading) {
+        <div class="loading-select">
+          <span class="spinner-small"></span>
+          <span>Cargando laboratorios...</span>
+        </div>
+        } @else if (laboratoriesVM.state().error) {
+        <div class="error-select">
+          <span class="error-icon">⚠️</span>
+          <span>{{ laboratoriesVM.state().error }}</span>
+          <button
+            type="button"
+            class="btn-retry"
+            (click)="onRetryLoadLaboratories()"
+          >
+            Reintentar
+          </button>
+        </div>
+        } @else {
+        <select
+          id="idLaboratory"
+          formControlName="idLaboratory"
+          [class.invalid]="isFieldInvalid('idLaboratory')"
+        >
+          <option value="" disabled>Selecciona un laboratorio</option>
+          @for (lab of laboratoriesVM.state().laboratories; track lab.id) {
+          <option [value]="lab.id">{{ lab.name }}</option>
+          }
+        </select>
+        } @if (isFieldInvalid('idLaboratory')) {
+        <span class="error-message">{{ getErrorMessage("idLaboratory") }}</span>
+        }
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label for="description">Descripción</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="4"
+          placeholder="Descripción del producto (opcional)"
+          [class.invalid]="isFieldInvalid('description')"
+        ></textarea>
+        @if (isFieldInvalid('description')) {
+        <span class="error-message">{{ getErrorMessage("description") }}</span>
+        }
+      </div>
+
+      <!-- Precio de Venta -->
+      <div class="form-group">
+        <label for="salesPrice">Precio de Venta</label>
+        <input
+          type="number"
+          id="salesPrice"
+          formControlName="salesPrice"
+          placeholder="0"
+          min="0"
+          [class.invalid]="isFieldInvalid('salesPrice')"
+        />
+        @if (isFieldInvalid('salesPrice')) {
+        <span class="error-message">{{ getErrorMessage("salesPrice") }}</span>
+        }
+        <small class="form-hint"
+          >Precio opcional. Si no se especifica, el producto no tendrá precio de
+          venta definido.</small
+        >
+      </div>
+
+      <!-- Error del formulario -->
+      @if (error()) {
+      <div class="form-error">
+        <span class="error-icon">⚠️</span>
+        <span>{{ error() }}</span>
+      </div>
+      }
+
+      <!-- Botones de acción -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="onCancel()"
+          [disabled]="loading()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="loading() || productForm.invalid"
+        >
+          @if (loading()) {
+          <span class="spinner"></span>
+          <span>Actualizando...</span>
+          } @else {
+          <span>Actualizar Producto</span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+  }
+
+  <!-- Toast Notification -->
+  @if (showToast()) {
+  <div class="toast-container">
+    <div class="toast toast--{{ toastType() }}">
+      <div class="toast-content">
+        <span class="toast-icon">
+          @if (toastType() === 'success') { ✓ } @else if (toastType() ===
+          'error') { ✕ } @else { ℹ }
+        </span>
+        <span class="toast-message">{{ toastMessage() }}</span>
+      </div>
+      <button class="toast-close" (click)="showToast.set(false)">✕</button>
+    </div>
+  </div>
+  }
+</div>
