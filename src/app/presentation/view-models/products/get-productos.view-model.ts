@@ -1,17 +1,7 @@
-import { DestroyRef, inject, Injectable, Signal } from '@angular/core';
-import { Product } from '../../../domain/products/products.entity';
-import { GetProductsUseCase } from '../../../application/use-cases/products/get-products.usecase';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import {
-  catchError,
-  map,
-  Observable,
-  of,
-  startWith,
-  Subject,
-  switchMap,
-} from 'rxjs';
-import { GetProductsResponse } from '../../../domain/products/products.response';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { GetProductsUseCase } from '@application/use-cases/products/get-products.usecase';
+import { Product } from '@domain/products/products.entity';
 
 export interface ProductsState {
   products: Product[];
@@ -28,46 +18,47 @@ const initialState: ProductsState = {
 @Injectable()
 export class GetProductsViewModel {
   private readonly getProductsUseCase = inject(GetProductsUseCase);
-
   private readonly destroyRef = inject(DestroyRef);
 
-  private readonly retrySubject = new Subject<void>();
+  state = signal<ProductsState>(initialState);
 
-  readonly productsSignal: Signal<ProductsState> = toSignal(
-    this.retrySubject.pipe(
-      startWith(undefined),
-      switchMap(() => this.fetchProducts()),
-      takeUntilDestroyed(this.destroyRef)
-    ),
-    { initialValue: initialState }
-  );
-
-  retry(): void {
-    this.retrySubject.next();
+  getProducts(): void {
+    this.setLoading();
+    this.getProductsUseCase
+      .execute()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.updateProducts(response.products);
+        },
+        error: (error) => {
+          this.setError(error);
+        },
+      });
   }
 
-  private fetchProducts(): Observable<ProductsState> {
-    return this.getProductsUseCase.execute().pipe(
-      map((response) => this.toSuccessState(response)),
-      catchError((error) => this.toErrorState(error)),
-      startWith(initialState)
-    );
-  }
-
-  private toSuccessState(response: GetProductsResponse): ProductsState {
-    return {
-      products: response.products,
-      loading: false,
-      error: null,
-    };
-  }
-
-  private toErrorState(error: unknown): Observable<ProductsState> {
-    console.error('Error fetching products:', error);
-    return of({
+  private setError(errorMessage: string): void {
+    console.error('Error al cargar productos:', errorMessage);
+    this.state.set({
       products: [],
       loading: false,
-      error: 'Error al cargar los productos. Por favor, reintente.',
+      error: 'Error al cargar los productos. Por favor, intenta de nuevo.',
+    });
+  }
+
+  private setLoading(): void {
+    this.state.update((currentState) => ({
+      ...currentState,
+      loading: true,
+      error: null,
+    }));
+  }
+
+  private updateProducts(products: Product[]): void {
+    this.state.set({
+      products: products,
+      loading: false,
+      error: null,
     });
   }
 }

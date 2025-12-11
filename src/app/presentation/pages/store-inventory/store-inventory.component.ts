@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -25,9 +25,8 @@ import { HeaderComponent } from '@presentation/shared/components/molecules/heade
   templateUrl: './store-inventory.component.html',
   styleUrl: './store-inventory.component.scss',
 })
-export class StoreInventoryComponent {
+export class StoreInventoryComponent implements OnInit {
   private readonly router = inject(Router);
-
   protected readonly getProductsVM = inject(GetProductsViewModel);
 
   addButtonConfig: ButtonConfigurationInterface = {
@@ -40,7 +39,21 @@ export class StoreInventoryComponent {
     color: 'black',
   };
 
-  goToAddProduct() {
+  ngOnInit(): void {
+    // Cargar productos al iniciar el componente
+    this.getProductsVM.getProducts();
+  }
+
+  goToAddProduct(): void {
     this.router.navigate(['/inventario/crear-producto']);
+  }
+
+  goToEditProduct(id: number): void {
+    console.log('goToEditProduct', id);
+    this.router.navigate([`/inventario/editar-producto/${id}`]);
+  }
+
+  retry(): void {
+    this.getProductsVM.getProducts();
   }
 }

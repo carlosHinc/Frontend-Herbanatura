@@ -1,10 +1,7 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import {
-  Product,
-  ProductsCloseToExpiring,
-} from '../../../domain/products/products.entity';
+import { ProductsCloseToExpiring } from '../../../domain/products/products.entity';
 import { GetProductsExpiringUseCase } from '@application/use-cases/products/get-products-expiring.usecase';
 
 export interface ProductsState {

@@ -6,41 +6,43 @@
   />
 
   <!-- Loading -->
-  @if (getProductsVM.productsSignal().loading) {
+  @if (getProductsVM.state().loading) {
   <div class="loading">
     <p>Cargando productos...</p>
   </div>
   }
 
   <!-- Error -->
-  @if (getProductsVM.productsSignal().error) {
+  @if (getProductsVM.state().error) {
   <div class="error">
-    <p>{{ getProductsVM.productsSignal().error }}</p>
-    <button (click)="getProductsVM.retry()">Reintentar</button>
+    <p>{{ getProductsVM.state().error }}</p>
+    <button (click)="retry()">Reintentar</button>
   </div>
   }
 
   <!-- Tabla de productos -->
-  @if (!getProductsVM.productsSignal().loading &&
-  !getProductsVM.productsSignal().error &&
-  getProductsVM.productsSignal().products.length > 0) {
+  @if (!getProductsVM.state().loading && !getProductsVM.state().error &&
+  getProductsVM.state().products.length > 0) {
   <div class="table-container">
     <table class="products-table">
       <thead>
         <tr>
           <th>Nombre</th>
           <th>Laboratorio</th>
+          <th>Descripción</th>
           <th>Precio de Venta</th>
           <th>Stock</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        @for (product of getProductsVM.productsSignal().products; track
-        product.id) {
+        @for (product of getProductsVM.state().products; track product.id) {
         <tr>
           <td class="product-name">{{ product.name }}</td>
           <td class="laboratory">{{ product.laboratory }}</td>
+          <td class="description">
+            {{ product.description || "Sin descripción" }}
+          </td>
           <td class="price">
             {{
               product.salesPrice | currency : "COP" : "symbol-narrow" : "1.0-0"
@@ -52,7 +54,11 @@
             </span>
           </td>
           <td class="actions">
-            <button class="btn-edit" title="Editar">
+            <button
+              (click)="goToEditProduct(product.id)"
+              class="btn-edit"
+              title="Editar"
+            >
               <span>✏️</span>
             </button>
             <button class="btn-delete" title="Eliminar">
@@ -67,12 +73,13 @@
   }
 
   <!-- Sin productos -->
-  @if (!getProductsVM.productsSignal().loading &&
-  !getProductsVM.productsSignal().error &&
-  getProductsVM.productsSignal().products.length === 0) {
+  @if (!getProductsVM.state().loading && !getProductsVM.state().error &&
+  getProductsVM.state().products.length === 0) {
   <div class="empty-state">
     <p>No hay productos en el inventario</p>
-    <button class="btn-add">Agregar primer producto</button>
+    <button class="btn-add" (click)="goToAddProduct()">
+      Agregar primer producto
+    </button>
   </div>
   }
 </div>

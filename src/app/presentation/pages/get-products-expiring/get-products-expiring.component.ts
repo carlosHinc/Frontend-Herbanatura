@@ -9,6 +9,7 @@ import { GetProductsExpiringViewModel } from '@presentation/view-models/products
 
 @Component({
   selector: 'app-get-products-expiring',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   providers: [
     GetProductsExpiringViewModel,
