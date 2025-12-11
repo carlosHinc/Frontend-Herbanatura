@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -73,6 +73,23 @@ export class CreateProductsComponent implements OnInit {
     'success'
   );
 
+  protected readonly showLaboratoryDropdown = signal(false);
+  protected readonly laboratorySearchTerm = signal('');
+  protected readonly selectedLaboratoryName = signal('');
+
+  protected readonly filteredLaboratories = computed(() => {
+    const searchTerm = this.laboratorySearchTerm().toLowerCase();
+    const laboratories = this.laboratoriesVM.state().laboratories;
+
+    if (!searchTerm) {
+      return laboratories;
+    }
+
+    return laboratories.filter((lab) =>
+      lab.name.toLowerCase().includes(searchTerm)
+    );
+  });
+
   // Método para mostrar toast
   private showToastNotification(
     message: string,
@@ -108,6 +125,13 @@ export class CreateProductsComponent implements OnInit {
 
     this.productForm.get('unitPurchasePrice')?.valueChanges.subscribe(() => {
       this.calculateTotalPrice();
+    });
+
+    document.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.custom-select')) {
+        this.showLaboratoryDropdown.set(false);
+      }
     });
   }
 
@@ -292,5 +316,29 @@ export class CreateProductsComponent implements OnInit {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(this.totalPurchasePrice());
+  }
+
+  toggleLaboratoryDropdown(): void {
+    this.showLaboratoryDropdown.update((value) => !value);
+    if (!this.showLaboratoryDropdown()) {
+      this.laboratorySearchTerm.set('');
+    }
+  }
+
+  selectLaboratory(labId: number, labName: string): void {
+    this.productForm.patchValue({
+      idLaboratory: labId,
+    });
+    this.selectedLaboratoryName.set(labName);
+    this.showLaboratoryDropdown.set(false);
+    this.laboratorySearchTerm.set('');
+  }
+
+  clearLaboratorySelection(): void {
+    this.productForm.patchValue({
+      idLaboratory: '',
+    });
+    this.selectedLaboratoryName.set('');
+    this.laboratorySearchTerm.set('');
   }
 }

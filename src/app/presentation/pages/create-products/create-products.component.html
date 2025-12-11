@@ -34,8 +34,7 @@
         }
       </div>
 
-      <!-- Select de Laboratorio -->
-      <!-- Select de Laboratorio -->
+      <!-- Select de Laboratorio con buscador -->
       <div class="form-group">
         <div class="laboratory-header">
           <label for="idLaboratory"
@@ -69,19 +68,64 @@
           </button>
         </div>
         } @else {
-        <select
-          id="idLaboratory"
-          formControlName="idLaboratory"
+        <!-- Custom Select con buscador -->
+        <div
+          class="custom-select"
           [class.invalid]="isFieldInvalid('idLaboratory')"
         >
-          <option value="" disabled selected>Selecciona un laboratorio</option>
-          @for (lab of laboratoriesVM.state().laboratories; track lab.id) {
-          <option [value]="lab.id">{{ lab.name }}</option>
+          <div
+            class="select-trigger"
+            (click)="toggleLaboratoryDropdown()"
+            [class.active]="showLaboratoryDropdown()"
+          >
+            <span class="select-value">
+              @if (selectedLaboratoryName()) {
+              {{ selectedLaboratoryName() }}
+              } @else { Selecciona un laboratorio }
+            </span>
+            <span class="select-arrow">▼</span>
+          </div>
+
+          @if (showLaboratoryDropdown()) {
+          <div class="select-dropdown">
+            <!-- Input de búsqueda -->
+            <div class="search-box">
+              <input
+                type="text"
+                [value]="laboratorySearchTerm()"
+                (input)="laboratorySearchTerm.set($any($event.target).value)"
+                placeholder="Buscar laboratorio..."
+                (click)="$event.stopPropagation()"
+              />
+              <span class="search-icon">🔍</span>
+            </div>
+
+            <!-- Lista de opciones filtradas -->
+            <div class="options-list">
+              @if (filteredLaboratories().length > 0) { @for (lab of
+              filteredLaboratories(); track lab.id) {
+              <div
+                class="option-item"
+                [class.selected]="
+                  productForm.get('idLaboratory')?.value === lab.id
+                "
+                (click)="selectLaboratory(lab.id, lab.name)"
+              >
+                {{ lab.name }}
+              </div>
+              } } @else {
+              <div class="no-results">
+                <span>No se encontraron laboratorios</span>
+              </div>
+              }
+            </div>
+          </div>
           }
-        </select>
-        } @if (isFieldInvalid('idLaboratory')) {
+        </div>
+
+        @if (isFieldInvalid('idLaboratory')) {
         <span class="error-message">{{ getErrorMessage("idLaboratory") }}</span>
-        }
+        } }
       </div>
 
       <!-- Modal para crear laboratorio -->
