@@ -45,7 +45,7 @@ export class StoreInventoryComponent implements OnInit {
   protected readonly searchTerm = signal<string>('');
   protected readonly currentPage = signal<number>(1);
   protected readonly itemsPerPage = 5;
-  
+
   // Ordenamiento
   protected readonly sortOrder = signal<'asc' | 'desc' | null>(null);
 
