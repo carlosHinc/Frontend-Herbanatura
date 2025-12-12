@@ -11,10 +11,10 @@
     <span class="alert-icon">⚠️</span>
     <span>{{ error() }}</span>
   </div>
-  } @if (productsVM.productsSignal().error) {
+  } @if (productsVM.state().error) {
   <div class="alert alert-error">
     <span class="alert-icon">⚠️</span>
-    <span>{{ productsVM.productsSignal().error }}</span>
+    <span>{{ productsVM.state().error }}</span>
     <button class="btn-retry" (click)="onRetryLoadProducts()">
       Reintentar cargar productos
     </button>
@@ -30,7 +30,7 @@
           type="button"
           class="btn-add-batch"
           (click)="addBatch()"
-          [disabled]="productsVM.productsSignal().loading"
+          [disabled]="productsVM.state().loading"
         >
           + Agregar Lote
         </button>
@@ -60,32 +60,43 @@
                 >Producto <span class="required">*</span></label
               >
 
-              @if (productsVM.productsSignal().loading) {
+              @if (productsVM.state().loading) {
               <div class="loading-select">
                 <span class="spinner-small"></span>
                 <span>Cargando productos...</span>
               </div>
               } @else {
-              <select
-                [id]="'product-' + $index"
-                formControlName="idProduct"
+              <ng-select
+                [items]="products"
+                bindLabel="name"
+                bindValue="id"
+                [formControl]="getProductControl($index)"
+                placeholder="Selecciona un producto"
+                [searchable]="true"
+                [clearable]="true"
+                notFoundText="No se encontraron productos"
                 [class.invalid]="isBatchFieldInvalid($index, 'idProduct')"
               >
-                <option value="" disabled selected>
-                  Selecciona un producto
-                </option>
-                @for (product of productsVM.productsSignal().products; track
-                product.id) {
-                <option [value]="product.id">
-                  {{ product.name }} - {{ product.laboratory }}
-                </option>
-                }
-              </select>
-              } @if (isBatchFieldInvalid($index, 'idProduct')) {
+                <ng-template ng-label-tmp let-item="item">
+                  {{ item.name }} - {{ item.laboratory }}
+                </ng-template>
+                <ng-template
+                  ng-option-tmp
+                  let-item="item"
+                  let-search="searchTerm"
+                >
+                  <div class="product-option">
+                    <div class="product-name">{{ item.name }}</div>
+                    <div class="product-lab">{{ item.laboratory }}</div>
+                  </div>
+                </ng-template>
+              </ng-select>
+
+              @if (isBatchFieldInvalid($index, 'idProduct')) {
               <span class="error-message">{{
                 getErrorMessage("required")
               }}</span>
-              }
+              } }
             </div>
 
             <!-- Nombre del lote -->
@@ -191,7 +202,7 @@
             type="button"
             class="btn-primary"
             (click)="addBatch()"
-            [disabled]="productsVM.productsSignal().loading"
+            [disabled]="productsVM.state().loading"
           >
             + Agregar Primer Lote
           </button>
@@ -234,7 +245,7 @@
           loading() ||
           orderForm.invalid ||
           batches.length === 0 ||
-          productsVM.productsSignal().loading
+          productsVM.state().loading
         "
       >
         @if (loading()) {

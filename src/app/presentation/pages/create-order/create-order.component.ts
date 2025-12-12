@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import {
   FormArray,
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { CreateOrderViewModel } from '@presentation/view-models/orders/create-order.view-model';
 import { CreateOrderGateway } from '@domain/orders/create-order.gateway';
@@ -22,7 +24,7 @@ import { CreateOrder } from '@domain/orders/orders.entity';
 @Component({
   selector: 'app-create-order',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NgSelectModule],
   providers: [
     CreateOrderViewModel,
     CreateOrderUseCase,
@@ -54,13 +56,16 @@ export class CreateOrderComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    // Los productos se cargan automáticamente con el ViewModel reactivo
-    // Agregar un lote inicial vacío
+    this.productsVM.getProducts();
     this.addBatch();
   }
 
   get batches(): FormArray {
     return this.orderForm.get('batches') as FormArray;
+  }
+
+  get products() {
+    return this.productsVM.state().products;
   }
 
   createBatchFormGroup(): FormGroup {
@@ -84,7 +89,6 @@ export class CreateOrderComponent implements OnInit {
     }
   }
 
-  // Calcular el precio total de un lote específico
   getBatchTotalPrice(index: number): number {
     const batch = this.batches.at(index);
     const stock = parseInt(batch.get('stock')?.value) || 0;
@@ -92,7 +96,6 @@ export class CreateOrderComponent implements OnInit {
     return stock * unitPrice;
   }
 
-  // Calcular el total de toda la orden
   calculateOrderTotal(): number {
     return this.batches.controls.reduce((total, batch, index) => {
       return total + this.getBatchTotalPrice(index);
@@ -134,8 +137,6 @@ export class CreateOrderComponent implements OnInit {
       };
 
       await this.vm.execute(orderData);
-
-      // Redirigir después de crear la orden
       this.router.navigate(['/inventario/productos']);
     } catch (error: any) {
       console.error('Error al crear orden:', error);
@@ -151,7 +152,6 @@ export class CreateOrderComponent implements OnInit {
     this.router.navigate(['/inventario/productos']);
   }
 
-  // Helpers para validaciones
   isBatchFieldInvalid(batchIndex: number, fieldName: string): boolean {
     const control = this.batches.at(batchIndex).get(fieldName);
     return !!(control?.invalid && (control?.touched || control?.dirty));
@@ -174,6 +174,10 @@ export class CreateOrderComponent implements OnInit {
   }
 
   onRetryLoadProducts(): void {
-    this.productsVM.retry();
+    this.productsVM.getProducts();
+  }
+
+  getProductControl(index: number) {
+    return this.batches.at(index).get('idProduct') as FormControl;
   }
 }

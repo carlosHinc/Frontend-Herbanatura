@@ -415,3 +415,123 @@
     }
   }
 }
+
+// ...existing code...
+
+// Estilos para ng-select personalizado
+// ...existing code...
+
+// Estilos para ng-select personalizado
+::ng-deep {
+  .ng-select {
+    &.invalid {
+      .ng-select-container {
+        border-color: #f44336 !important;
+      }
+    }
+
+    .ng-select-container {
+      border-radius: 6px;
+      min-height: 45px;
+      border: 1px solid #ddd;
+      transition: border-color 0.3s, box-shadow 0.3s;
+
+      &:hover {
+        border-color: #2196f3;
+      }
+    }
+
+    &.ng-select-focused {
+      .ng-select-container {
+        border-color: #2196f3;
+        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+      }
+    }
+
+    // 👇 ESTO ES LO IMPORTANTE - aumentar z-index
+    .ng-dropdown-panel {
+      z-index: 9999 !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-top: 4px;
+    }
+
+    .ng-dropdown-panel-items {
+      max-height: 300px;
+    }
+
+    .ng-option {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #f0f0f0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .product-option {
+        .product-name {
+          font-weight: 500;
+          color: #333;
+          margin-bottom: 0.25rem;
+          font-size: 0.95rem;
+        }
+
+        .product-lab {
+          font-size: 0.875rem;
+          color: #666;
+        }
+      }
+
+      &.ng-option-selected {
+        background-color: #e3f2fd;
+
+        .product-option {
+          .product-name {
+            color: #2196f3;
+            font-weight: 600;
+          }
+
+          .product-lab {
+            color: #1976d2;
+          }
+        }
+      }
+
+      &.ng-option-marked {
+        background-color: #f5f5f5;
+      }
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+
+    .ng-placeholder {
+      color: #999;
+    }
+
+    .ng-clear-wrapper {
+      color: #999;
+
+      &:hover {
+        color: #f44336;
+      }
+    }
+
+    .ng-arrow-wrapper {
+      .ng-arrow {
+        border-color: #666 transparent transparent;
+        border-style: solid;
+        border-width: 5px 5px 2.5px;
+      }
+    }
+
+    &.ng-select-opened {
+      .ng-arrow-wrapper .ng-arrow {
+        border-color: transparent transparent #666;
+        border-width: 0 5px 5px;
+      }
+    }
+  }
+}
