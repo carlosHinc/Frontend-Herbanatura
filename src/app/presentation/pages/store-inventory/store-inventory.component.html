@@ -58,7 +58,16 @@
           <th>Laboratorio</th>
           <th>Descripción</th>
           <th>Precio de Venta</th>
-          <th>Stock</th>
+          <th>
+            <button
+              class="sort-button"
+              (click)="toggleSortByStock()"
+              [class.active]="sortOrder() !== null"
+              title="Ordenar por stock"
+            >
+              Stock {{ getSortIcon() }}
+            </button>
+          </th>
           <th>Acciones</th>
         </tr>
       </thead>

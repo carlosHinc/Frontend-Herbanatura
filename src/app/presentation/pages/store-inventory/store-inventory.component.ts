@@ -45,22 +45,40 @@ export class StoreInventoryComponent implements OnInit {
   protected readonly searchTerm = signal<string>('');
   protected readonly currentPage = signal<number>(1);
   protected readonly itemsPerPage = 5;
+  
+  // Ordenamiento
+  protected readonly sortOrder = signal<'asc' | 'desc' | null>(null);
 
   // Productos filtrados por búsqueda
   protected readonly filteredProducts = computed(() => {
     const products = this.getProductsVM.state().products;
     const term = this.searchTerm().toLowerCase().trim();
+    const sort = this.sortOrder();
 
-    if (!term) {
-      return products;
+    let filtered = products;
+
+    // Filtrar por búsqueda
+    if (term) {
+      filtered = products.filter(
+        (product) =>
+          product.name.toLowerCase().includes(term) ||
+          product.laboratory.toLowerCase().includes(term) ||
+          product.description?.toLowerCase().includes(term)
+      );
     }
 
-    return products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(term) ||
-        product.laboratory.toLowerCase().includes(term) ||
-        product.description?.toLowerCase().includes(term)
-    );
+    // Ordenar por stock
+    if (sort) {
+      filtered = [...filtered].sort((a, b) => {
+        if (sort === 'asc') {
+          return a.stock - b.stock;
+        } else {
+          return b.stock - a.stock;
+        }
+      });
+    }
+
+    return filtered;
   });
 
   // Productos paginados
@@ -114,6 +132,26 @@ export class StoreInventoryComponent implements OnInit {
   clearSearch(): void {
     this.searchTerm.set('');
     this.currentPage.set(1);
+  }
+
+  // Métodos de ordenamiento
+  toggleSortByStock(): void {
+    const current = this.sortOrder();
+    if (current === null) {
+      this.sortOrder.set('asc');
+    } else if (current === 'asc') {
+      this.sortOrder.set('desc');
+    } else {
+      this.sortOrder.set(null);
+    }
+    this.currentPage.set(1); // Resetear a la primera página al ordenar
+  }
+
+  getSortIcon(): string {
+    const sort = this.sortOrder();
+    if (sort === 'asc') return '↑';
+    if (sort === 'desc') return '↓';
+    return '⇅';
   }
 
   // Métodos de paginación
