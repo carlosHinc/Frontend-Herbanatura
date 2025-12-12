@@ -76,6 +76,7 @@
 
           <div class="product-form">
             <!-- Selector de producto -->
+            <!-- Selector de producto con ng-select -->
             <div class="form-group">
               <label [for]="'product-' + $index"
                 >Producto <span class="required">*</span></label
@@ -87,20 +88,34 @@
                 <span>Cargando productos...</span>
               </div>
               } @else {
-              <select
-                [id]="'product-' + $index"
-                formControlName="idProduct"
+              <ng-select
+                [items]="productsForSale"
+                bindLabel="name"
+                bindValue="id"
+                [formControl]="getProductControl($index)"
+                placeholder="Selecciona un producto"
+                [searchable]="true"
+                [clearable]="true"
+                notFoundText="No se encontraron productos"
                 [class.invalid]="isProductFieldInvalid($index, 'idProduct')"
               >
-                <option value="" disabled selected>
-                  Selecciona un producto
-                </option>
-                @for (prod of productsVM.state().products; track prod.id) {
-                <option [value]="prod.id">
-                  {{ prod.name }} - {{ prod.laboratory }}
-                </option>
-                }
-              </select>
+                <ng-template ng-label-tmp let-item="item">
+                  {{ item.name }} - {{ item.laboratory }}
+                </ng-template>
+                <ng-template
+                  ng-option-tmp
+                  let-item="item"
+                  let-search="searchTerm"
+                >
+                  <div class="product-option">
+                    <div class="product-name">{{ item.name }}</div>
+                    <div class="product-lab">{{ item.laboratory }}</div>
+                    <div class="product-stock">
+                      Stock: {{ item.stock }} unidades
+                    </div>
+                  </div>
+                </ng-template>
+              </ng-select>
 
               @if (product.get('idProduct')?.value) {
               <small class="field-hint stock-info">
@@ -108,11 +123,11 @@
                 {{ getAvailableStock(product.get("idProduct")?.value) }}
                 unidades
               </small>
-              } } @if (isProductFieldInvalid($index, 'idProduct')) {
+              } @if (isProductFieldInvalid($index, 'idProduct')) {
               <span class="error-message">{{
                 getErrorMessage($index, "idProduct")
               }}</span>
-              }
+              } }
             </div>
 
             <div class="form-row">

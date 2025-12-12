@@ -8,8 +8,10 @@ import {
   Validators,
   AbstractControl,
   ValidationErrors,
+  FormControl,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { CreateSaleViewModel } from '@presentation/view-models/sales/create-sale.view-model';
 import { CreateSaleGateway } from '@domain/sales/create-sale.gateway';
@@ -24,7 +26,7 @@ import { CreateSale } from '@domain/sales/sales.entity';
 @Component({
   selector: 'app-create-sale',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NgSelectModule],
   providers: [
     CreateSaleViewModel,
     CreateSaleUseCase,
@@ -63,6 +65,15 @@ export class CreateSaleComponent implements OnInit {
 
   get products(): FormArray {
     return this.saleForm.get('products') as FormArray;
+  }
+
+  get productsForSale() {
+    return this.productsVM.state().products;
+  }
+
+  // Helper para obtener el FormControl del producto
+  getProductControl(index: number): FormControl {
+    return this.products.at(index).get('idProduct') as FormControl;
   }
 
   // Validador personalizado para verificar stock disponible
@@ -105,9 +116,7 @@ export class CreateSaleComponent implements OnInit {
     // Escuchar cambios en el producto seleccionado para actualizar el precio y revalidar stock
     group.get('idProduct')?.valueChanges.subscribe((productId) => {
       if (productId) {
-        const product = this.productsForSale.find(
-          (p) => p.id === parseInt(productId)
-        );
+        const product = this.productsForSale.find((p) => p.id === +productId);
         if (product && product.salesPrice) {
           group.get('unitPrice')?.setValue(product.salesPrice);
         } else {
@@ -188,8 +197,6 @@ export class CreateSaleComponent implements OnInit {
       };
 
       await this.vm.execute(saleData);
-
-      // Redirigir después de crear la venta
       this.router.navigate(['/store-inventory']);
     } catch (error: any) {
       console.error('Error al crear venta:', error);
@@ -259,19 +266,6 @@ export class CreateSaleComponent implements OnInit {
     return this.products.controls.reduce((sum, product) => {
       return sum + (parseInt(product.get('stock')?.value) || 0);
     }, 0);
-  }
-
-  // Getters para el template
-  get productsForSale() {
-    return this.productsVM.state().products;
-  }
-
-  get productsLoading() {
-    return this.productsVM.state().loading;
-  }
-
-  get productsError() {
-    return this.productsVM.state().error;
   }
 
   onRetryLoadProducts(): void {
