@@ -5,9 +5,36 @@
     (buttonEvent)="goToAddProduct()"
   />
 
+  <!-- Buscador -->
+  @if (!getProductsVM.state().loading && !getProductsVM.state().error &&
+  getProductsVM.state().products.length > 0) {
+  <div class="search-container">
+    <div class="search-box">
+      <input
+        type="text"
+        [value]="searchTerm()"
+        (input)="onSearchChange($any($event.target).value)"
+        placeholder="Buscar por nombre, laboratorio o descripción..."
+        class="search-input"
+      />
+      @if (searchTerm()) {
+      <button
+        class="clear-search"
+        (click)="clearSearch()"
+        title="Limpiar búsqueda"
+      >
+        ✕
+      </button>
+      }
+      <span class="search-icon">🔍</span>
+    </div>
+  </div>
+  }
+
   <!-- Loading -->
   @if (getProductsVM.state().loading) {
   <div class="loading">
+    <div class="spinner"></div>
     <p>Cargando productos...</p>
   </div>
   }
@@ -16,13 +43,13 @@
   @if (getProductsVM.state().error) {
   <div class="error">
     <p>{{ getProductsVM.state().error }}</p>
-    <button (click)="retry()">Reintentar</button>
+    <button (click)="retry()" class="btn-retry">Reintentar</button>
   </div>
   }
 
   <!-- Tabla de productos -->
   @if (!getProductsVM.state().loading && !getProductsVM.state().error &&
-  getProductsVM.state().products.length > 0) {
+  paginatedProducts().length > 0) {
   <div class="table-container">
     <table class="products-table">
       <thead>
@@ -36,7 +63,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (product of getProductsVM.state().products; track product.id) {
+        @for (product of paginatedProducts(); track product.id) {
         <tr>
           <td class="product-name">{{ product.name }}</td>
           <td class="laboratory">{{ product.laboratory }}</td>
@@ -69,10 +96,58 @@
         }
       </tbody>
     </table>
+
+    <!-- Paginación -->
+    @if (totalPages() > 1) {
+    <div class="pagination-container">
+      <div class="pagination-info">
+        {{ getPaginationInfo() }}
+      </div>
+
+      <div class="pagination-controls">
+        <button
+          class="pagination-btn"
+          [disabled]="!canGoPrevious()"
+          (click)="previousPage()"
+          title="Página anterior"
+        >
+          ‹
+        </button>
+
+        @for (page of pageNumbers(); track page) {
+        <button
+          class="pagination-btn"
+          [class.active]="currentPage() === page"
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+        }
+
+        <button
+          class="pagination-btn"
+          [disabled]="!canGoNext()"
+          (click)="nextPage()"
+          title="Página siguiente"
+        >
+          ›
+        </button>
+      </div>
+    </div>
+    }
   </div>
   }
 
-  <!-- Sin productos -->
+  <!-- Sin resultados de búsqueda -->
+  @if (!getProductsVM.state().loading && !getProductsVM.state().error &&
+  filteredProducts().length === 0 && searchTerm()) {
+  <div class="empty-state">
+    <p>No se encontraron productos que coincidan con "{{ searchTerm() }}"</p>
+    <button class="btn-clear" (click)="clearSearch()">Limpiar búsqueda</button>
+  </div>
+  }
+
+  <!-- Sin productos en inventario -->
   @if (!getProductsVM.state().loading && !getProductsVM.state().error &&
   getProductsVM.state().products.length === 0) {
   <div class="empty-state">
