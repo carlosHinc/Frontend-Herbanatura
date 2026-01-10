@@ -240,6 +240,14 @@ export class CreateProductsComponent implements OnInit {
       return;
     }
 
+    const confirmed = window.confirm(
+      '¿Estás seguro de que deseas crear este producto?'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     this.loading.set(true);
     this.error.set(null);
 

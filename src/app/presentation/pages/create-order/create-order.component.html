@@ -162,7 +162,7 @@
               <!-- Precio unitario -->
               <div class="form-group">
                 <label [for]="'unitPrice-' + $index"
-                  >Precio Unitario <span class="required">*</span></label
+                  >Precio Compra Unitario <span class="required">*</span></label
                 >
                 <input
                   type="number"
@@ -210,6 +210,15 @@
         }
       </div>
     </div>
+
+    <button
+      type="button"
+      class="btn-add-batch btn-add-batch--right-alignment"
+      (click)="addBatch()"
+      [disabled]="productsVM.state().loading"
+    >
+      + Agregar Lote
+    </button>
 
     <!-- Resumen del pedido -->
     <div class="order-summary">

@@ -84,27 +84,6 @@
           color: #333;
           margin: 0;
         }
-
-        .btn-add-batch {
-          background-color: #4caf50;
-          color: white;
-          padding: 0.5rem 1rem;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.95rem;
-          font-weight: 500;
-          transition: background-color 0.3s;
-
-          &:hover:not(:disabled) {
-            background-color: #45a049;
-          }
-
-          &:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-          }
-        }
       }
 
       .batches-list {
@@ -386,10 +365,6 @@
           flex-direction: column;
           align-items: stretch;
           gap: 1rem;
-
-          .btn-add-batch {
-            width: 100%;
-          }
         }
 
         .batches-list {
@@ -533,5 +508,39 @@
         border-width: 0 5px 5px;
       }
     }
+  }
+}
+
+.btn-add-batch {
+  background-color: #4caf50;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background-color 0.3s;
+
+  &:hover:not(:disabled) {
+    background-color: #45a049;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &--right-alignment {
+    display: block;
+    margin-left: auto;
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .btn-add-batch {
+    width: 100%;
   }
 }

@@ -43,7 +43,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/order-list']);
+    this.router.navigate(['/pedidos-realizados']);
   }
 
   formatCurrency(value: number): string {

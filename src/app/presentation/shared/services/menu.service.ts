@@ -58,6 +58,13 @@ export class MenuService {
       route: '/pedidos-realizados',
       hasSubmenu: false,
     },
+    {
+      id: 'sales-list',
+      title: 'Ventas Realizadas',
+      icon: 'bi-cash-coin',
+      route: '/ventas',
+      hasSubmenu: false,
+    },
   ];
 
   getMenuItems(): MenuItem[] {
