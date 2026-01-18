@@ -7,18 +7,19 @@
   </div>
 
   @if (error()) {
-  <div class="alert alert-error">
-    <span class="alert-icon">⚠️</span>
-    <span>{{ error() }}</span>
-  </div>
-  } @if (productsVM.state().error) {
-  <div class="alert alert-error">
-    <span class="alert-icon">⚠️</span>
-    <span>{{ productsVM.state().error }}</span>
-    <button class="btn-retry" (click)="onRetryLoadProducts()">
-      Reintentar cargar productos
-    </button>
-  </div>
+    <div class="alert alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+  @if (productsVM.state().error) {
+    <div class="alert alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ productsVM.state().error }}</span>
+      <button class="btn-retry" (click)="onRetryLoadProducts()">
+        Reintentar cargar productos
+      </button>
+    </div>
   }
 
   <form [formGroup]="saleForm" (ngSubmit)="onSubmit()" class="sale-form">
@@ -38,7 +39,7 @@
           [class.invalid]="isDescriptionInvalid()"
         />
         @if (isDescriptionInvalid()) {
-        <span class="error-message">{{ getDescriptionErrorMessage() }}</span>
+          <span class="error-message">{{ getDescriptionErrorMessage() }}</span>
         }
       </div>
     </div>
@@ -59,143 +60,164 @@
 
       <div formArrayName="products" class="products-list">
         @for (product of products.controls; track $index) {
-        <div [formGroupName]="$index" class="product-card">
-          <div class="product-header">
-            <h3>Producto #{{ $index + 1 }}</h3>
-            @if (products.length > 1) {
-            <button
-              type="button"
-              class="btn-remove"
-              (click)="removeProduct($index)"
-              title="Eliminar producto"
-            >
-              🗑️
-            </button>
-            }
-          </div>
-
-          <div class="product-form">
-            <!-- Selector de producto -->
-            <!-- Selector de producto con ng-select -->
-            <div class="form-group">
-              <label [for]="'product-' + $index"
-                >Producto <span class="required">*</span></label
-              >
-
-              @if (productsVM.state().loading) {
-              <div class="loading-select">
-                <span class="spinner-small"></span>
-                <span>Cargando productos...</span>
-              </div>
-              } @else {
-              <ng-select
-                [items]="productsForSale"
-                bindLabel="name"
-                bindValue="id"
-                [formControl]="getProductControl($index)"
-                placeholder="Selecciona un producto"
-                [searchable]="true"
-                [clearable]="true"
-                notFoundText="No se encontraron productos"
-                [class.invalid]="isProductFieldInvalid($index, 'idProduct')"
-              >
-                <ng-template ng-label-tmp let-item="item">
-                  {{ item.name }} - {{ item.laboratory }}
-                </ng-template>
-                <ng-template
-                  ng-option-tmp
-                  let-item="item"
-                  let-search="searchTerm"
+          <div [formGroupName]="$index" class="product-card">
+            <div class="product-header">
+              <h3>Producto #{{ $index + 1 }}</h3>
+              @if (products.length > 1) {
+                <button
+                  type="button"
+                  class="btn-remove"
+                  (click)="removeProduct($index)"
+                  title="Eliminar producto"
                 >
-                  <div class="product-option">
-                    <div class="product-name">{{ item.name }}</div>
-                    <div class="product-lab">{{ item.laboratory }}</div>
-                    <div class="product-stock">
-                      Stock: {{ item.stock }} unidades
-                    </div>
-                  </div>
-                </ng-template>
-              </ng-select>
-
-              @if (product.get('idProduct')?.value) {
-              <small class="field-hint stock-info">
-                Stock disponible:
-                {{ getAvailableStock(product.get("idProduct")?.value) }}
-                unidades
-              </small>
-              } @if (isProductFieldInvalid($index, 'idProduct')) {
-              <span class="error-message">{{
-                getErrorMessage($index, "idProduct")
-              }}</span>
-              } }
+                  🗑️
+                </button>
+              }
             </div>
 
-            <div class="form-row">
-              <!-- Cantidad -->
+            <div class="product-form">
+              <!-- Selector de producto -->
+              <!-- Selector de producto con ng-select -->
               <div class="form-group">
-                <label [for]="'stock-' + $index"
-                  >Cantidad <span class="required">*</span></label
+                <label [for]="'product-' + $index"
+                  >Producto <span class="required">*</span></label
                 >
-                <input
-                  type="number"
-                  [id]="'stock-' + $index"
-                  formControlName="stock"
-                  placeholder="0"
-                  min="1"
-                  [class.invalid]="isProductFieldInvalid($index, 'stock')"
-                />
-                @if (isProductFieldInvalid($index, 'stock')) {
-                <span class="error-message">{{
-                  getErrorMessage($index, "stock")
-                }}</span>
+
+                @if (productsVM.state().loading) {
+                  <div class="loading-select">
+                    <span class="spinner-small"></span>
+                    <span>Cargando productos...</span>
+                  </div>
+                } @else {
+                  <ng-select
+                    [items]="productsForSale"
+                    bindLabel="name"
+                    bindValue="id"
+                    [formControl]="getProductControl($index)"
+                    placeholder="Selecciona un producto"
+                    [searchable]="true"
+                    [clearable]="true"
+                    notFoundText="No se encontraron productos"
+                    [class.invalid]="isProductFieldInvalid($index, 'idProduct')"
+                  >
+                    <ng-template ng-label-tmp let-item="item">
+                      {{ item.name }} - {{ item.laboratory }}
+                    </ng-template>
+                    <ng-template
+                      ng-option-tmp
+                      let-item="item"
+                      let-search="searchTerm"
+                    >
+                      <div class="product-option">
+                        <div class="product-name">{{ item.name }}</div>
+                        <div class="product-lab">{{ item.laboratory }}</div>
+                        <div class="product-stock">
+                          Stock: {{ item.stock }} unidades
+                        </div>
+                      </div>
+                    </ng-template>
+                  </ng-select>
+
+                  @if (product.get("idProduct")?.value) {
+                    <small class="field-hint stock-info">
+                      Stock disponible:
+                      {{ getAvailableStock(product.get("idProduct")?.value) }}
+                      unidades
+                    </small>
+                  }
+                  @if (isProductFieldInvalid($index, "idProduct")) {
+                    <span class="error-message">{{
+                      getErrorMessage($index, "idProduct")
+                    }}</span>
+                  }
                 }
               </div>
 
-              <!-- Precio unitario (readonly) -->
-              <div class="form-group">
-                <label [for]="'unitPrice-' + $index">Precio Unitario</label>
-                <input
-                  type="text"
-                  [id]="'unitPrice-' + $index"
-                  [value]="
-                    getFormattedPrice(product.get('unitPrice')?.value || 0)
-                  "
-                  readonly
-                  class="readonly-field"
-                />
-                <small class="field-hint">Precio de venta del producto</small>
-              </div>
+              <div class="form-row">
+                <!-- Cantidad -->
+                <div class="form-group">
+                  <label [for]="'stock-' + $index"
+                    >Cantidad <span class="required">*</span></label
+                  >
+                  <input
+                    type="number"
+                    [id]="'stock-' + $index"
+                    formControlName="stock"
+                    placeholder="0"
+                    min="1"
+                    [class.invalid]="isProductFieldInvalid($index, 'stock')"
+                  />
+                  @if (isProductFieldInvalid($index, "stock")) {
+                    <span class="error-message">{{
+                      getErrorMessage($index, "stock")
+                    }}</span>
+                  }
+                </div>
 
-              <!-- Total del producto (readonly) -->
-              <div class="form-group">
-                <label [for]="'total-' + $index">Total</label>
-                <input
-                  type="text"
-                  [id]="'total-' + $index"
-                  [value]="getFormattedPrice(getProductTotal($index))"
-                  readonly
-                  class="readonly-field"
-                />
-                <small class="field-hint">Calculado automáticamente</small>
+                <!-- Precio unitario (editable) -->
+                <div class="form-group">
+                  <label [for]="'unitPrice-' + $index"
+                    >Precio Unitario <span class="required">*</span></label
+                  >
+                  <input
+                    type="number"
+                    [id]="'unitPrice-' + $index"
+                    formControlName="unitPrice"
+                    placeholder="0"
+                    min="0"
+                    [class.invalid]="isProductFieldInvalid($index, 'unitPrice')"
+                  />
+                  @if (isProductFieldInvalid($index, "unitPrice")) {
+                    <span class="error-message">{{
+                      getErrorMessage($index, "unitPrice")
+                    }}</span>
+                  }
+                  <small class="field-hint"
+                    >Se autocompleta con el precio de venta. Puedes editarlo
+                    para aplicar descuentos.</small
+                  >
+                </div>
+
+                <!-- Total del producto (readonly) -->
+                <div class="form-group">
+                  <label [for]="'total-' + $index">Total</label>
+                  <input
+                    type="text"
+                    [id]="'total-' + $index"
+                    [value]="getFormattedPrice(getProductTotal($index))"
+                    readonly
+                    class="readonly-field"
+                  />
+                  <small class="field-hint">Calculado automáticamente</small>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        } @if (products.length === 0) {
-        <div class="empty-state">
-          <p>No hay productos agregados</p>
-          <button
-            type="button"
-            class="btn-primary"
-            (click)="addProduct()"
-            [disabled]="productsVM.state().loading"
-          >
-            + Agregar Primer Producto
-          </button>
-        </div>
+        }
+        @if (products.length === 0) {
+          <div class="empty-state">
+            <p>No hay productos agregados</p>
+            <button
+              type="button"
+              class="btn-primary"
+              (click)="addProduct()"
+              [disabled]="productsVM.state().loading"
+            >
+              + Agregar Primer Producto
+            </button>
+          </div>
         }
       </div>
     </div>
+
+    <button
+      type="button"
+      class="btn-add-product btn-add-product--right-alignment"
+      (click)="addProduct()"
+      [disabled]="productsVM.state().loading"
+    >
+      + Agregar Producto
+    </button>
 
     <!-- Resumen de la venta -->
     <div class="sale-summary">
@@ -241,10 +263,10 @@
         "
       >
         @if (loading()) {
-        <span class="spinner"></span>
-        <span>Registrando Venta...</span>
+          <span class="spinner"></span>
+          <span>Registrando Venta...</span>
         } @else {
-        <span>Registrar Venta</span>
+          <span>Registrar Venta</span>
         }
       </button>
     </div>

@@ -104,10 +104,7 @@ export class CreateSaleComponent implements OnInit {
     const group = this.fb.group({
       idProduct: ['', [Validators.required]],
       stock: [1, [Validators.required, Validators.min(1)]],
-      unitPrice: [
-        { value: 0, disabled: true },
-        [Validators.required, Validators.min(0)],
-      ],
+      unitPrice: [0, [Validators.required, Validators.min(0)]],
     });
 
     // Agregar validador de stock después de crear el grupo
@@ -119,6 +116,7 @@ export class CreateSaleComponent implements OnInit {
         const product = this.productsForSale.find((p) => p.id === +productId);
         if (product && product.salesPrice) {
           group.get('unitPrice')?.setValue(product.salesPrice);
+          group.get('stock')?.setValue(1);
         } else {
           group.get('unitPrice')?.setValue(0);
         }
@@ -201,7 +199,8 @@ export class CreateSaleComponent implements OnInit {
     } catch (error: any) {
       console.error('Error al crear venta:', error);
       this.error.set(
-        error.message || 'Error al crear la venta. Por favor, intenta de nuevo.'
+        error.message ||
+          'Error al crear la venta. Por favor, intenta de nuevo.',
       );
     } finally {
       this.loading.set(false);
