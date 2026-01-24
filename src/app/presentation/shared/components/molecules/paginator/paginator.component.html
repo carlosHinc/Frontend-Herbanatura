@@ -1,0 +1,65 @@
+<div class="pagination-container">
+  @if (config().showInfo !== false) {
+    <div class="pagination-info">
+      {{ paginationInfo() }}
+    </div>
+  }
+
+  <div class="pagination-controls">
+    <!-- Primera página -->
+    @if (config().totalPages > (config().maxVisiblePages || 5)) {
+      <button
+        class="pagination-btn"
+        [disabled]="!canGoPrevious()"
+        (click)="firstPage()"
+        title="Primera página"
+      >
+        ‹‹
+      </button>
+    }
+
+    <!-- Página anterior -->
+    <button
+      class="pagination-btn"
+      [disabled]="!canGoPrevious()"
+      (click)="previousPage()"
+      title="Página anterior"
+    >
+      ‹
+    </button>
+
+    <!-- Números de página -->
+    @for (page of pageNumbers(); track page) {
+      <button
+        class="pagination-btn"
+        [class.active]="config().currentPage === page"
+        (click)="goToPage(page)"
+        [title]="'Ir a página ' + page"
+      >
+        {{ page }}
+      </button>
+    }
+
+    <!-- Página siguiente -->
+    <button
+      class="pagination-btn"
+      [disabled]="!canGoNext()"
+      (click)="nextPage()"
+      title="Página siguiente"
+    >
+      ›
+    </button>
+
+    <!-- Última página -->
+    @if (config().totalPages > (config().maxVisiblePages || 5)) {
+      <button
+        class="pagination-btn"
+        [disabled]="!canGoNext()"
+        (click)="lastPage()"
+        title="Última página"
+      >
+        ››
+      </button>
+    }
+  </div>
+</div>

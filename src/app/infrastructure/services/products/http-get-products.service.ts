@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { delay, map, Observable } from 'rxjs';
 import { GetProductsResponse } from '../../../domain/products/products.response';
 import { GetProductsGateway } from '../../../domain/products/get-products.gateway';
 import { HttpClient } from '@angular/common/http';
@@ -15,9 +15,10 @@ export class HttpGetProductsService implements GetProductsGateway {
     return this.httpClient
       .get<HttpGetProductsResponse>(`${environment.apiUrl}/products`)
       .pipe(
+        delay(3000), // Delay de 2 segundos para validar loading
         map((response) => ({
           products: response.data.map(ProductMapper.fromHttp),
-        }))
+        })),
       );
   }
 }

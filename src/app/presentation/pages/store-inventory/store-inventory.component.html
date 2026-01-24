@@ -6,164 +6,57 @@
   />
 
   <!-- Buscador -->
-  @if (!getProductsVM.state().loading && !getProductsVM.state().error &&
-  getProductsVM.state().products.length > 0) {
-  <div class="search-container">
-    <div class="search-box">
-      <input
-        type="text"
-        [value]="searchTerm()"
-        (input)="onSearchChange($any($event.target).value)"
-        placeholder="Buscar por nombre, laboratorio o descripción..."
-        class="search-input"
-      />
-      @if (searchTerm()) {
-      <button
-        class="clear-search"
-        (click)="clearSearch()"
-        title="Limpiar búsqueda"
-      >
-        ✕
-      </button>
-      }
-      <span class="search-icon">🔍</span>
-    </div>
-  </div>
+  @if (hasProductsLoaded()) {
+    <ds-search-box
+      [value]="searchTerm()"
+      [placeholder]="'Buscar por nombre, laboratorio o descripción...'"
+      (valueChange)="onSearchChange($event)"
+      (clear)="clearSearch()"
+    />
   }
 
   <!-- Loading -->
   @if (getProductsVM.state().loading) {
-  <div class="loading">
-    <div class="spinner"></div>
-    <p>Cargando productos...</p>
-  </div>
+    <ds-loading text="Cargando productos..." />
   }
 
   <!-- Error -->
   @if (getProductsVM.state().error) {
-  <div class="error">
-    <p>{{ getProductsVM.state().error }}</p>
-    <button (click)="retry()" class="btn-retry">Reintentar</button>
-  </div>
+    <ds-error-services-list
+      textBtn="Reintentar"
+      (retry)="retry()"
+      [errorMessage]="getProductsVM.state().error!"
+    />
   }
 
   <!-- Tabla de productos -->
-  @if (!getProductsVM.state().loading && !getProductsVM.state().error &&
-  paginatedProducts().length > 0) {
-  <div class="table-container">
-    <table class="products-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Laboratorio</th>
-          <th>Descripción</th>
-          <th>Precio de Venta</th>
-          <th>
-            <button
-              class="sort-button"
-              (click)="toggleSortByStock()"
-              [class.active]="sortOrder() !== null"
-              title="Ordenar por stock"
-            >
-              Stock {{ getSortIcon() }}
-            </button>
-          </th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (product of paginatedProducts(); track product.id) {
-        <tr>
-          <td class="product-name">{{ product.name }}</td>
-          <td class="laboratory">{{ product.laboratory }}</td>
-          <td class="description">
-            {{ product.description || "Sin descripción" }}
-          </td>
-          <td class="price">
-            {{
-              product.salesPrice | currency : "COP" : "symbol-narrow" : "1.0-0"
-            }}
-          </td>
-          <td>
-            <span class="stock-badge" [class.low-stock]="product.stock < 10">
-              {{ product.stock }}
-            </span>
-          </td>
-          <td class="actions">
-            <button
-              (click)="goToEditProduct(product.id)"
-              class="btn-edit"
-              title="Editar"
-            >
-              <span>✏️</span>
-            </button>
-            <button class="btn-delete" title="Eliminar">
-              <span>🗑️</span>
-            </button>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+  @if (hasProductsLoaded() && paginatedProducts().length > 0) {
+    <ds-data-table [config]="tableConfig()" (sort)="onTableSort($event)" />
 
     <!-- Paginación -->
     @if (totalPages() > 1) {
-    <div class="pagination-container">
-      <div class="pagination-info">
-        {{ getPaginationInfo() }}
-      </div>
-
-      <div class="pagination-controls">
-        <button
-          class="pagination-btn"
-          [disabled]="!canGoPrevious()"
-          (click)="previousPage()"
-          title="Página anterior"
-        >
-          ‹
-        </button>
-
-        @for (page of pageNumbers(); track page) {
-        <button
-          class="pagination-btn"
-          [class.active]="currentPage() === page"
-          (click)="goToPage(page)"
-        >
-          {{ page }}
-        </button>
-        }
-
-        <button
-          class="pagination-btn"
-          [disabled]="!canGoNext()"
-          (click)="nextPage()"
-          title="Página siguiente"
-        >
-          ›
-        </button>
-      </div>
-    </div>
+      <ds-paginator
+        [config]="paginatorConfig()"
+        (pageChange)="onPageChange($event)"
+      />
     }
-  </div>
   }
 
   <!-- Sin resultados de búsqueda -->
-  @if (!getProductsVM.state().loading && !getProductsVM.state().error &&
-  filteredProducts().length === 0 && searchTerm()) {
-  <div class="empty-state">
-    <p>No se encontraron productos que coincidan con "{{ searchTerm() }}"</p>
-    <button class="btn-clear" (click)="clearSearch()">Limpiar búsqueda</button>
-  </div>
+  @if (hasProductsLoaded() && filteredProducts().length === 0 && searchTerm()) {
+    <ds-empty-state
+      [message]="emptySearchMessage()"
+      textBtn="Limpiar búsqueda"
+      (click)="clearSearch()"
+    />
   }
 
   <!-- Sin productos en inventario -->
-  @if (!getProductsVM.state().loading && !getProductsVM.state().error &&
-  getProductsVM.state().products.length === 0) {
-  <div class="empty-state">
-    <p>No hay productos en el inventario</p>
-    <button class="btn-add" (click)="goToAddProduct()">
-      Agregar primer producto
-    </button>
-  </div>
+  @if (isEmptyInventory()) {
+    <ds-empty-state
+      message="No hay productos en el inventario"
+      textBtn="Agregar primer producto"
+      (click)="goToAddProduct()"
+    />
   }
 </div>

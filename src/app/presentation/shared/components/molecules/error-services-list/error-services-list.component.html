@@ -1,0 +1,9 @@
+<div class="error">
+  <span class="error-icon">⚠️</span>
+  <p>{{ errorMessage() }}</p>
+  @if (textBtn()) {
+    <button (click)="retry()" class="btn-retry">
+      {{ textBtn() }}
+    </button>
+  }
+</div>

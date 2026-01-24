@@ -6,6 +6,7 @@ import { ButtonConfigurationInterface } from '../../atoms/button/button.interfac
 
 @Component({
   selector: 'ds-header',
+  standalone: true,
   imports: [H1Component, ButtonComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',

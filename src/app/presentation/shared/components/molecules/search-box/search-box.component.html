@@ -1,0 +1,16 @@
+<div class="search-container">
+  <div class="search-box">
+    <ds-input
+      [value]="value()"
+      [placeholder]="placeholder()"
+      class="search-input"
+      (valueChange)="onInputChange($event)"
+    />
+    @if (value()) {
+    <button class="clear-search" (click)="onClear()" title="Limpiar búsqueda">
+      ✕
+    </button>
+    }
+    <span class="search-icon">🔍</span>
+  </div>
+</div>

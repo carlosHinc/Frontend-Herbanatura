@@ -1,0 +1,68 @@
+<div class="table-container">
+  <table class="data-table">
+    <thead>
+      <tr>
+        @for (column of config().columns; track column.key) {
+          <th [class]="column.customClass">
+            @if (column.sortable) {
+              <button
+                class="sort-button"
+                (click)="onSort(column.key)"
+                [class.active]="isSortActive(column.key)"
+                [title]="'Ordenar por ' + column.header"
+              >
+                {{ column.header }} {{ getSortIcon(column.key) }}
+              </button>
+            } @else {
+              {{ column.header }}
+            }
+          </th>
+        }
+        @if (config().actions && config().actions!.length > 0) {
+          <th>Acciones</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @if (config().data.length === 0) {
+        <tr>
+          <td
+            [attr.colspan]="
+              config().columns.length + (config().actions?.length ? 1 : 0)
+            "
+            class="empty-message"
+          >
+            {{ config().emptyMessage || "No hay datos disponibles" }}
+          </td>
+        </tr>
+      } @else {
+        @for (row of config().data; track trackByFn($index, row)) {
+          <tr>
+            @for (column of config().columns; track column.key) {
+              <td [class]="column.customClass">
+                @if (column.renderHtml) {
+                  <span [innerHTML]="column.renderHtml(row)"></span>
+                } @else {
+                  {{ getCellValue(row, column) }}
+                }
+              </td>
+            }
+            @if (config().actions && config().actions!.length > 0) {
+              <td class="actions">
+                @for (action of config().actions; track action.label) {
+                  <button
+                    (click)="action.handler(row)"
+                    [class]="'btn-action ' + (action.class || '')"
+                    [title]="action.title || action.label"
+                  >
+                    <span>{{ action.icon }}</span>
+                  </button>
+                }
+              </td>
+            }
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>
