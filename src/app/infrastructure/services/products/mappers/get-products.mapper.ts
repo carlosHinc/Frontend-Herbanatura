@@ -13,14 +13,14 @@ export class ProductMapper {
       id: httpProductData.id,
       name: httpProductData.name,
       laboratory: httpProductData.laboratory,
-      stock: httpProductData.stock,
+      stock: Number(httpProductData.stock),
       salesPrice: httpProductData.sales_price,
       description: httpProductData.description || undefined,
     };
   }
 
   static fromHttpExpiring(
-    httpData: HttpDataProductExpiring
+    httpData: HttpDataProductExpiring,
   ): ProductsCloseToExpiring {
     return {
       product: {

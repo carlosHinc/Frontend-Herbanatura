@@ -1,62 +1,69 @@
-<div class="inventory-container">
+<ds-list-template>
   <ds-header
+    header-content
     [configH1]="h1Config"
     [configButton]="addButtonConfig"
     (buttonEvent)="goToAddProduct()"
   />
 
-  <!-- Buscador -->
   @if (hasProductsLoaded()) {
     <ds-search-box
-      [value]="searchTerm()"
+      search-box-content
+      [value]="paginationSortVM.searchTerm$()"
       [placeholder]="'Buscar por nombre, laboratorio o descripción...'"
       (valueChange)="onSearchChange($event)"
       (clear)="clearSearch()"
     />
   }
 
-  <!-- Loading -->
   @if (getProductsVM.state().loading) {
-    <ds-loading text="Cargando productos..." />
+    <ds-loading loading-content text="Cargando productos..." />
   }
 
-  <!-- Error -->
   @if (getProductsVM.state().error) {
     <ds-error-services-list
+      error-service-content
       textBtn="Reintentar"
       (retry)="retry()"
       [errorMessage]="getProductsVM.state().error!"
     />
   }
 
-  <!-- Tabla de productos -->
   @if (hasProductsLoaded() && paginatedProducts().length > 0) {
-    <ds-data-table [config]="tableConfig()" (sort)="onTableSort($event)" />
-
-    <!-- Paginación -->
-    @if (totalPages() > 1) {
-      <ds-paginator
-        [config]="paginatorConfig()"
-        (pageChange)="onPageChange($event)"
-      />
-    }
+    <ds-data-table
+      table-content
+      [config]="tableConfig()"
+      (sort)="onTableSort($event)"
+    />
   }
 
-  <!-- Sin resultados de búsqueda -->
-  @if (hasProductsLoaded() && filteredProducts().length === 0 && searchTerm()) {
+  @if (totalPages() > 1) {
+    <ds-paginator
+      paginator-content
+      [config]="paginatorConfig()"
+      (pageChange)="onPageChange($event)"
+    />
+  }
+
+  @if (
+    hasProductsLoaded() &&
+    filteredAndSortedProducts().length === 0 &&
+    paginationSortVM.searchTerm$()
+  ) {
     <ds-empty-state
+      search-not-content
       [message]="emptySearchMessage()"
       textBtn="Limpiar búsqueda"
       (click)="clearSearch()"
     />
   }
 
-  <!-- Sin productos en inventario -->
   @if (isEmptyInventory()) {
     <ds-empty-state
+      not-results-content
       message="No hay productos en el inventario"
       textBtn="Agregar primer producto"
       (click)="goToAddProduct()"
     />
   }
-</div>
+</ds-list-template>

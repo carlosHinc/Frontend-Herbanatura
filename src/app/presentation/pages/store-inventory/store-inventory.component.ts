@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -6,6 +6,8 @@ import { GetProductsGateway } from '@domain/products/get-products.gateway';
 import { GetProductsUseCase } from '@application/use-cases/products/get-products.usecase';
 import { HttpGetProductsService } from '@infrastructure/services/products/http-get-products.service';
 import { GetProductsViewModel } from '@presentation/view-models/products/get-productos.view-model';
+import { PaginationSortViewModel } from '@presentation/view-models/shared/pagination-sort.view-model';
+import { ProductsTableConfigViewModel } from '@presentation/view-models/products/products-table-config.view-model';
 import { ButtonConfigurationInterface } from '@presentation/shared/components/atoms/button/button.interface';
 import { H1ConfigurationInterface } from '@presentation/shared/components/atoms/h1/h1.interface';
 import { SearchBoxComponent } from '@presentation/shared/components/molecules/search-box/search-box.component';
@@ -24,6 +26,7 @@ import {
   PageChangeEvent,
 } from '@presentation/shared/components/molecules/paginator/paginator.interface';
 import { Product } from '@domain/products/products.entity';
+import { ListTemplateComponent } from '@presentation/shared/components/templates/list.template/list.template.component';
 
 @Component({
   standalone: true,
@@ -37,10 +40,13 @@ import { Product } from '@domain/products/products.entity';
     EmptyStateComponent,
     DataTableComponent,
     PaginatorComponent,
+    ListTemplateComponent,
   ],
   providers: [
     GetProductsViewModel,
     GetProductsUseCase,
+    PaginationSortViewModel,
+    ProductsTableConfigViewModel,
     {
       provide: GetProductsGateway,
       useClass: HttpGetProductsService,
@@ -52,6 +58,10 @@ import { Product } from '@domain/products/products.entity';
 export class StoreInventoryComponent implements OnInit {
   private readonly router = inject(Router);
   protected readonly getProductsVM = inject(GetProductsViewModel);
+  protected readonly paginationSortVM = inject(
+    PaginationSortViewModel<Product>,
+  );
+  private readonly tableConfigVM = inject(ProductsTableConfigViewModel);
 
   // Configuraciones
   addButtonConfig: ButtonConfigurationInterface = {
@@ -64,61 +74,48 @@ export class StoreInventoryComponent implements OnInit {
     color: 'black',
   };
 
-  // Paginación y búsqueda
-  protected readonly searchTerm = signal<string>('');
-  protected readonly currentPage = signal<number>(1);
-  protected readonly itemsPerPage = 5;
+  constructor() {
+    // Configurar items por página
+    this.paginationSortVM.setItemsPerPage(5);
+  }
 
-  // Ordenamiento
-  protected readonly sortOrder = signal<'asc' | 'desc' | null>(null);
-
-  // Productos filtrados por búsqueda
-  protected readonly filteredProducts = computed(() => {
+  // Productos filtrados por búsqueda y ordenados
+  protected readonly filteredAndSortedProducts = computed(() => {
     const products = this.getProductsVM.state().products;
-    const term = this.searchTerm().toLowerCase().trim();
-    const sort = this.sortOrder();
-
-    let filtered = products;
 
     // Filtrar por búsqueda
-    if (term) {
-      filtered = products.filter(
-        (product) =>
-          product.name.toLowerCase().includes(term) ||
-          product.laboratory.toLowerCase().includes(term) ||
-          product.description?.toLowerCase().includes(term),
-      );
-    }
+    const filtered = this.paginationSortVM.filterItems(
+      products,
+      (product: Product) => [
+        product.name,
+        product.laboratory,
+        product.description || '',
+      ],
+    );
 
     // Ordenar por stock
-    if (sort) {
-      filtered = [...filtered].sort((a, b) => {
-        if (sort === 'asc') {
-          return a.stock - b.stock;
-        } else {
-          return b.stock - a.stock;
-        }
-      });
-    }
-
-    return filtered;
+    return this.paginationSortVM.sortItems(
+      filtered,
+      (product: Product) => product.stock,
+    );
   });
 
   // Productos paginados
   protected readonly paginatedProducts = computed(() => {
-    const filtered = this.filteredProducts();
-    const start = (this.currentPage() - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    return filtered.slice(start, end);
+    return this.paginationSortVM.paginateItems(
+      this.filteredAndSortedProducts(),
+    );
   });
 
   // Total de páginas
   protected readonly totalPages = computed(() => {
-    return Math.ceil(this.filteredProducts().length / this.itemsPerPage);
+    return this.paginationSortVM.calculateTotalPages(
+      this.filteredAndSortedProducts().length,
+    );
   });
 
   protected readonly emptySearchMessage = computed(() => {
-    return `No se encontraron productos que coincidan con "${this.searchTerm()}"`;
+    return this.paginationSortVM.getEmptySearchMessage();
   });
 
   // Validación de productos cargados exitosamente
@@ -140,77 +137,20 @@ export class StoreInventoryComponent implements OnInit {
   });
 
   // Configuración de la tabla
-  protected readonly tableConfig = computed<DataTableConfig<Product>>(() => ({
-    columns: [
-      {
-        key: 'name',
-        header: 'Nombre',
-        customClass: 'product-name',
-      },
-      {
-        key: 'laboratory',
-        header: 'Laboratorio',
-        customClass: 'laboratory',
-      },
-      {
-        key: 'description',
-        header: 'Descripción',
-        customClass: 'description',
-        render: (product: Product) => product.description || 'Sin descripción',
-      },
-      {
-        key: 'salesPrice',
-        header: 'Precio de Venta',
-        customClass: 'price',
-        render: (product: Product) => {
-          return new Intl.NumberFormat('es-CO', {
-            style: 'currency',
-            currency: 'COP',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-          }).format(product.salesPrice);
-        },
-      },
-      {
-        key: 'stock',
-        header: 'Stock',
-        sortable: true,
-        renderHtml: (product: Product) => {
-          const lowStockClass = product.stock < 10 ? 'low-stock' : '';
-          return `<span class="stock-badge ${lowStockClass}">${product.stock}</span>`;
-        },
-      },
-    ],
-    actions: [
-      {
-        label: 'Editar',
-        icon: '✏️',
-        handler: (product: Product) => this.goToEditProduct(product.id),
-        class: 'btn-edit',
-        title: 'Editar',
-      },
-      {
-        label: 'Eliminar',
-        icon: '🗑️',
-        handler: (product: Product) => console.log('Eliminar', product.id),
-        class: 'btn-delete',
-        title: 'Eliminar',
-      },
-    ],
-    data: this.paginatedProducts(),
-    trackBy: (index: number, item: Product) => item.id,
-  }));
+  protected readonly tableConfig = computed<DataTableConfig<Product>>(() =>
+    this.tableConfigVM.getTableConfig(
+      this.paginatedProducts(),
+      (id: number) => this.goToEditProduct(id),
+      (id: number) => this.handleDeleteProduct(id),
+    ),
+  );
 
   // Configuración del paginador
-  protected readonly paginatorConfig = computed<PaginatorConfig>(() => ({
-    currentPage: this.currentPage(),
-    totalPages: this.totalPages(),
-    totalItems: this.filteredProducts().length,
-    itemsPerPage: this.itemsPerPage,
-    maxVisiblePages: 5,
-    showInfo: true,
-    infoTemplate: 'Mostrando {start}-{end} de {total} productos',
-  }));
+  protected readonly paginatorConfig = computed<PaginatorConfig>(() =>
+    this.paginationSortVM.getPaginatorConfig(
+      this.filteredAndSortedProducts().length,
+    ),
+  );
 
   ngOnInit(): void {
     this.getProductsVM.getProducts();
@@ -218,26 +158,23 @@ export class StoreInventoryComponent implements OnInit {
 
   // Métodos de búsqueda
   onSearchChange(value: string): void {
-    this.searchTerm.set(value);
-    this.currentPage.set(1); // Resetear a la primera página al buscar
+    this.paginationSortVM.onSearchChange(value);
   }
 
   clearSearch(): void {
-    this.searchTerm.set('');
-    this.currentPage.set(1);
+    this.paginationSortVM.clearSearch();
   }
 
   // Métodos de ordenamiento
   onTableSort(event: SortEvent): void {
     if (event.column === 'stock') {
-      this.sortOrder.set(event.order);
-      this.currentPage.set(1); // Resetear a la primera página al ordenar
+      this.paginationSortVM.onSort(event);
     }
   }
 
   // Métodos de paginación
   onPageChange(event: PageChangeEvent): void {
-    this.currentPage.set(event.page);
+    this.paginationSortVM.onPageChange(event);
   }
 
   // Métodos de navegación
@@ -247,6 +184,11 @@ export class StoreInventoryComponent implements OnInit {
 
   goToEditProduct(id: number): void {
     this.router.navigate([`/inventario/editar-producto/${id}`]);
+  }
+
+  handleDeleteProduct(id: number): void {
+    console.log('Eliminar producto:', id);
+    // TODO: Implementar lógica de eliminación
   }
 
   retry(): void {
