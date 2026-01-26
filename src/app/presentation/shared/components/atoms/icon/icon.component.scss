@@ -1,0 +1,19 @@
+.icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+  pointer-events: none;
+  color: #718096;
+
+  &--input {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+  }
+
+  &--warning-yellow {
+    color: #ffd110;
+  }
+}

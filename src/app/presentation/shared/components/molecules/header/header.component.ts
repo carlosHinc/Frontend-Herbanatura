@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { H1Component } from '../../atoms/h1/h1.component';
 import { ButtonComponent } from '../../atoms/button/button.component';
-import { H1ConfigurationInterface } from '../../atoms/h1/h1.interface';
-import { ButtonConfigurationInterface } from '../../atoms/button/button.interface';
+import { DsHeaderConfig } from './ds-header.interface';
 
 @Component({
   selector: 'ds-header',
@@ -12,9 +11,7 @@ import { ButtonConfigurationInterface } from '../../atoms/button/button.interfac
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent {
-  @Input() configH1!: H1ConfigurationInterface;
-
-  @Input() configButton!: ButtonConfigurationInterface;
+  @Input() config!: DsHeaderConfig;
 
   @Output() buttonEvent = new EventEmitter<void>();
 

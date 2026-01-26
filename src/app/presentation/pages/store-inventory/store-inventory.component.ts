@@ -8,8 +8,7 @@ import { HttpGetProductsService } from '@infrastructure/services/products/http-g
 import { GetProductsViewModel } from '@presentation/view-models/products/get-productos.view-model';
 import { PaginationSortViewModel } from '@presentation/view-models/shared/pagination-sort.view-model';
 import { ProductsTableConfigViewModel } from '@presentation/view-models/products/products-table-config.view-model';
-import { ButtonConfigurationInterface } from '@presentation/shared/components/atoms/button/button.interface';
-import { H1ConfigurationInterface } from '@presentation/shared/components/atoms/h1/h1.interface';
+import { STORE_INVENTORY_CONFIG } from './store-inventory-ui.config';
 import { SearchBoxComponent } from '@presentation/shared/components/molecules/search-box/search-box.component';
 import { HeaderComponent } from '@presentation/shared/components/molecules/header/header.component';
 import { LoadingComponent } from '@presentation/shared/components/molecules/loading/loading.component';
@@ -57,26 +56,18 @@ import { ListTemplateComponent } from '@presentation/shared/components/templates
 })
 export class StoreInventoryComponent implements OnInit {
   private readonly router = inject(Router);
+
   protected readonly getProductsVM = inject(GetProductsViewModel);
+
   protected readonly paginationSortVM = inject(
     PaginationSortViewModel<Product>,
   );
   private readonly tableConfigVM = inject(ProductsTableConfigViewModel);
 
-  // Configuraciones
-  addButtonConfig: ButtonConfigurationInterface = {
-    text: '+ Agregar Producto',
-    color: 'green',
-  };
-
-  h1Config: H1ConfigurationInterface = {
-    text: 'Inventario de Productos',
-    color: 'black',
-  };
+  readonly configUI = STORE_INVENTORY_CONFIG;
 
   constructor() {
-    // Configurar items por página
-    this.paginationSortVM.setItemsPerPage(5);
+    this.paginationSortVM.setItemsPerPage(this.configUI.itemsPerPage);
   }
 
   // Productos filtrados por búsqueda y ordenados

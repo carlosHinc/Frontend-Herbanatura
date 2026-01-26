@@ -1,8 +1,7 @@
 <ds-list-template>
   <ds-header
     header-content
-    [configH1]="h1Config"
-    [configButton]="addButtonConfig"
+    [config]="configUI.header"
     (buttonEvent)="goToAddProduct()"
   />
 
@@ -10,20 +9,20 @@
     <ds-search-box
       search-box-content
       [value]="paginationSortVM.searchTerm$()"
-      [placeholder]="'Buscar por nombre, laboratorio o descripción...'"
+      [placeholder]="configUI.placeholderInputSearch"
       (valueChange)="onSearchChange($event)"
       (clear)="clearSearch()"
     />
   }
 
   @if (getProductsVM.state().loading) {
-    <ds-loading loading-content text="Cargando productos..." />
+    <ds-loading loading-content [text]="configUI.textLoading" />
   }
 
   @if (getProductsVM.state().error) {
     <ds-error-services-list
       error-service-content
-      textBtn="Reintentar"
+      [configButton]="configUI.buttonServiceError"
       (retry)="retry()"
       [errorMessage]="getProductsVM.state().error!"
     />

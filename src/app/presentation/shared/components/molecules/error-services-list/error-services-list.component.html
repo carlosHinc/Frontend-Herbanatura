@@ -1,9 +1,10 @@
 <div class="error">
-  <span class="error-icon">⚠️</span>
+  <ds-icon
+    icon="bi bi-exclamation-triangle-fill"
+    modifiers="icon--warning-yellow"
+  />
   <p>{{ errorMessage() }}</p>
-  @if (textBtn()) {
-    <button (click)="retry()" class="btn-retry">
-      {{ textBtn() }}
-    </button>
+  @if (configButton()) {
+    <ds-button [configButton]="configButton()!" (actionEvent)="retry()" />
   }
 </div>

@@ -7,10 +7,12 @@
       (valueChange)="onInputChange($event)"
     />
     @if (value()) {
-    <button class="clear-search" (click)="onClear()" title="Limpiar búsqueda">
-      ✕
-    </button>
+      <ds-icon-button
+        icon="bi bi-x"
+        (click)="onClear()"
+        title="Limpiar búsqueda"
+      />
     }
-    <span class="search-icon">🔍</span>
+    <ds-icon icon="bi bi-search" modifiers="icon--input" />
   </div>
 </div>
