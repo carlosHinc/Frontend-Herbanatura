@@ -35,7 +35,9 @@ export interface HttpCreateSaleResponse {
 }
 
 export interface HttpGetSalesResponse {
-  data: HttpSale[];
+  data: {
+    sales: HttpSale[];
+  };
 }
 
 export interface HttpGetSaleDetailsResponse {

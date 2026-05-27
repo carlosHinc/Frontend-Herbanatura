@@ -9,9 +9,7 @@ import { HttpGetProductsExpiringResponse } from './http-products.response';
 import { GetProductsExpiringGateway } from '@domain/products/get-products-expiring.gateway';
 
 @Injectable()
-export class HttpGetProductsExpiringService
-  implements GetProductsExpiringGateway
-{
+export class HttpGetProductsExpiringService implements GetProductsExpiringGateway {
   private readonly httpClient = inject(HttpClient);
 
   execute(daysToExpiration: number): Observable<GetProductsExpiringResponse> {
@@ -20,12 +18,12 @@ export class HttpGetProductsExpiringService
     return this.httpClient
       .get<HttpGetProductsExpiringResponse>(
         `${environment.apiUrl}/products/expiring`,
-        { params }
+        { params },
       )
       .pipe(
         map((response) => ({
-          products: response.data.map(ProductMapper.fromHttpExpiring),
-        }))
+          products: response.data.products.map(ProductMapper.fromHttpExpiring),
+        })),
       );
   }
 }

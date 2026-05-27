@@ -50,7 +50,9 @@ export interface HttpDataOrderDetails {
 }
 
 export interface HttpGetOrdersResponse {
-  data: HttpDataOrder[];
+  data: {
+    orders: HttpDataOrder[];
+  };
 }
 
 export interface HttpGetOrderDetailsResponse {

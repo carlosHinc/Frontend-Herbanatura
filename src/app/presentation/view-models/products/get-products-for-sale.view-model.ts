@@ -31,9 +31,11 @@ export class GetProductsForSaleViewModel {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
+          console.log('response', response);
           this.updateProducts(response.products);
         },
         error: (error) => {
+          console.log('error', error);
           this.setError(error);
         },
       });

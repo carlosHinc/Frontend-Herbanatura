@@ -5,6 +5,7 @@ interface HttpBatchExpiring {
   stock: number;
   entryDate: string;
   daysToExpire: number;
+  isInInventory: boolean;
 }
 
 export interface HttpDataProductExpiring {
@@ -14,6 +15,25 @@ export interface HttpDataProductExpiring {
   salesPrice: number;
   totalStock: number;
   batches: HttpBatchExpiring[];
+}
+
+interface HttpBatchExpired {
+  batchId: number;
+  batchName: string;
+  expirationDate: string;
+  stock: number;
+  entryDate: string;
+  daysSinceExpiration: number;
+  isInInventory: boolean;
+}
+
+export interface HttpDataProductExpired {
+  productId: number;
+  productName: string;
+  laboratory: string;
+  salesPrice: number;
+  totalStock: number;
+  batches: HttpBatchExpired[];
 }
 
 export interface HttpProductData {
@@ -27,7 +47,7 @@ export interface HttpProductData {
 }
 
 export interface HttpGetProductsResponse {
-  data: HttpProductData[];
+  data: { products: HttpProductData[] };
 }
 
 export interface HttpCreateProductResponse {
@@ -43,9 +63,17 @@ export interface HttpUpdateProductResponse {
 }
 
 export interface HttpGetProductsExpiringResponse {
-  data: HttpDataProductExpiring[];
+  data: { products: HttpDataProductExpiring[] };
+}
+
+export interface HttpGetProductsExpiredResponse {
+  data: { products: HttpDataProductExpired[] };
 }
 
 export interface HttpGetProductResponse {
   data: HttpProductData;
+}
+
+export interface HttpExpireInventoryBatchesResponse {
+  data: { processedBatches: number };
 }

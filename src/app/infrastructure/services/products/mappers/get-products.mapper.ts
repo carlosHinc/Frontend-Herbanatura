@@ -3,6 +3,7 @@ import {
   ProductsCloseToExpiring,
 } from '../../../../domain/products/products.entity';
 import {
+  HttpDataProductExpired,
   HttpDataProductExpiring,
   HttpProductData,
 } from '../http-products.response';
@@ -35,6 +36,7 @@ export class ProductMapper {
         expirationDate: batch.expirationDate,
         stock: batch.stock,
         daysToExpire: batch.daysToExpire,
+        batchId: batch.batchId,
       })),
     };
   }
@@ -49,6 +51,28 @@ export class ProductMapper {
       salesPrice: httpProductData.sales_price,
       idLaboratory: httpProductData.id_laboratory,
       description: httpProductData.description,
+    };
+  }
+
+  static fromHttpExpired(
+    httpData: HttpDataProductExpired,
+  ): ProductsCloseToExpiring {
+    return {
+      product: {
+        id: httpData.productId,
+        name: httpData.productName,
+        laboratory: httpData.laboratory,
+        stock: httpData.totalStock,
+        salesPrice: httpData.salesPrice,
+      },
+      inventory: httpData.batches.map((batch) => ({
+        purchaseDate: batch.entryDate,
+        expirationDate: batch.expirationDate,
+        stock: batch.stock,
+        daysToExpire: -batch.daysSinceExpiration,
+        isInInventory: batch.isInInventory,
+        batchId: batch.batchId,
+      })),
     };
   }
 }

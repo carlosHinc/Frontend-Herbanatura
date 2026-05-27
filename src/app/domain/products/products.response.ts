@@ -12,10 +12,18 @@ export interface GetProductsExpiringResponse {
   products: ProductsCloseToExpiring[];
 }
 
+export interface GetProductsExpiredResponse {
+  products: ProductsCloseToExpiring[];
+}
+
 export interface GetProductResponse {
   product: Product;
 }
 
 export interface UpdateProductResponse {
   product: Product;
+}
+
+export interface ExpireInventoryBatchesResponse {
+  processedBatches: number;
 }

@@ -9,7 +9,7 @@ import { ButtonConfigurationInterface } from './button.interface';
   styleUrl: './button.component.scss',
 })
 export class ButtonComponent {
-  @Input() configButton!: ButtonConfigurationInterface;
+  @Input({ required: true }) configButton!: ButtonConfigurationInterface;
 
   @Output() actionEvent = new EventEmitter<void>();
 

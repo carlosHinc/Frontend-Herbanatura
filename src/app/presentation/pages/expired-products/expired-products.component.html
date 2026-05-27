@@ -1,0 +1,128 @@
+<div class="expired-products-container">
+  <ds-header
+    [config]="headerConfig()"
+    (buttonEvent)="discountInventoryProducts()"
+  />
+
+  <!-- Overlay: descontando productos -->
+  @if (expireVM.state().expiring) {
+    <div class="expiring-overlay">
+      <div class="expiring-overlay__box">
+        <div class="spinner"></div>
+        <p>Descontando productos del inventario...</p>
+      </div>
+    </div>
+  }
+
+  <!-- Error al descontar -->
+  @if (expireVM.state().error) {
+    <div class="error">
+      <span class="error-icon">⚠️</span>
+      <p>{{ expireVM.state().error }}</p>
+    </div>
+  }
+
+  <!-- Loading -->
+  @if (productsExpiredVM.state().loading) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Cargando productos vencidos...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (productsExpiredVM.state().error) {
+    <div class="error">
+      <span class="error-icon">⚠️</span>
+      <p>{{ productsExpiredVM.state().error }}</p>
+      <button (click)="retry()" class="btn-retry">Reintentar</button>
+    </div>
+  }
+
+  <!-- Resumen -->
+  @if (hasProducts()) {
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="summary-icon">📦</div>
+        <div class="summary-content">
+          <span class="summary-label">Total Productos</span>
+          <span class="summary-value">{{ totalProducts() }}</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon">📊</div>
+        <div class="summary-content">
+          <span class="summary-label">Total Lotes</span>
+          <span class="summary-value">{{ totalBatches() }}</span>
+        </div>
+      </div>
+      <div class="summary-card summary-card--alert">
+        <div class="summary-icon">🔢</div>
+        <div class="summary-content">
+          <span class="summary-label">Stock Vencido</span>
+          <span class="summary-value">{{ totalStock() }} uds</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de productos -->
+    <div class="products-list">
+      @for (item of productsExpiredVM.state().products; track item.product.id) {
+        <div class="product-card">
+          <div class="product-header">
+            <div class="product-info">
+              <h3>{{ item.product.name }}</h3>
+              <span class="laboratory">{{ item.product.laboratory }}</span>
+            </div>
+            <div class="product-stock">
+              <span class="stock-label">Stock Vencido:</span>
+              <span class="stock-value stock-value--expired"
+                >{{ item.product.stock }} unidades</span
+              >
+            </div>
+          </div>
+
+          <div class="batches-section">
+            <h4>Lotes vencidos ({{ item.inventory.length }})</h4>
+            <div class="batches-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fecha de Vencimiento</th>
+                    <th>Stock</th>
+                    <th>Días Vencido</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (batch of item.inventory; track batch.expirationDate) {
+                    <tr class="row--expired">
+                      <td class="expiration-date">
+                        {{ formatDate(batch.expirationDate) }}
+                      </td>
+                      <td class="stock">{{ batch.stock }} unidades</td>
+                      <td class="days-expired">
+                        <span class="badge badge--expired">
+                          🔴 Hace
+                          {{ getDaysSinceExpiration(batch.daysToExpire) }} días
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Inventario vacío -->
+  @if (isEmpty()) {
+    <div class="empty-state">
+      <span class="empty-icon">✅</span>
+      <h3>Sin productos vencidos</h3>
+      <p>No hay lotes con stock vencido en el inventario.</p>
+    </div>
+  }
+</div>

@@ -17,8 +17,8 @@ export class HttpGetSalesService implements GetSalesGateway {
       .get<HttpGetSalesResponse>(`${environment.apiUrl}/sales`)
       .pipe(
         map((response) => ({
-          sales: response.data.map(SaleMapper.fromHttp),
-        }))
+          sales: response.data.sales.map(SaleMapper.fromHttp),
+        })),
       );
   }
 }

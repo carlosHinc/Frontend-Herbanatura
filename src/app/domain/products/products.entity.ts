@@ -31,6 +31,8 @@ export interface InventoryProductsCloseToExpiring {
   expirationDate: string;
   stock: number;
   daysToExpire: number;
+  isInInventory?: boolean;
+  batchId: number;
 }
 
 export interface ProductsCloseToExpiring {

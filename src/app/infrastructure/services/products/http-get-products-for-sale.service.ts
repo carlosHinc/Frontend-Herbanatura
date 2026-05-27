@@ -9,9 +9,7 @@ import { GetProductsResponse } from '@domain/products/products.response';
 import { HttpGetProductsResponse } from './http-products.response';
 
 @Injectable()
-export class HttpGetProductsForSaleService
-  implements GetProductsForSaleGateway
-{
+export class HttpGetProductsForSaleService implements GetProductsForSaleGateway {
   private readonly httpClient = inject(HttpClient);
 
   execute(): Observable<GetProductsResponse> {
@@ -19,8 +17,8 @@ export class HttpGetProductsForSaleService
       .get<HttpGetProductsResponse>(`${environment.apiUrl}/products/for-sale`)
       .pipe(
         map((response) => ({
-          products: response.data.map(ProductMapper.fromHttp),
-        }))
+          products: response.data.products.map(ProductMapper.fromHttp),
+        })),
       );
   }
 }

@@ -15,9 +15,9 @@ export class HttpGetProductsService implements GetProductsGateway {
     return this.httpClient
       .get<HttpGetProductsResponse>(`${environment.apiUrl}/products`)
       .pipe(
-        delay(3000), // Delay de 2 segundos para validar loading
+        delay(3000), // Delay de 3 segundos para validar loading
         map((response) => ({
-          products: response.data.map(ProductMapper.fromHttp),
+          products: response.data.products.map(ProductMapper.fromHttp),
         })),
       );
   }

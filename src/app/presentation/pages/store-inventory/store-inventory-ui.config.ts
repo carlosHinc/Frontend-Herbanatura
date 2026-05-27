@@ -8,14 +8,15 @@ export const STORE_INVENTORY_CONFIG: StoreInventoryUi = {
     },
     button: {
       text: '+ Agregar Producto',
-      color: 'green',
+      modifiers: 'btn--green',
     },
+    showButton: true,
   },
   itemsPerPage: 5,
   placeholderInputSearch: 'Buscar por nombre, laboratorio o descripción...',
   textLoading: 'Cargando productos...',
   buttonServiceError: {
-    color: 'red',
+    modifiers: 'btn--red',
     text: 'Reintentar',
   },
 };

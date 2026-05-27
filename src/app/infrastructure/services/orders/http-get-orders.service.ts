@@ -17,8 +17,8 @@ export class HttpGetOrdersService implements GetOrdersGateway {
       .get<HttpGetOrdersResponse>(`${environment.apiUrl}/orders`)
       .pipe(
         map((response) => ({
-          orders: response.data.map(GetOrdersMapper.fromHttp),
-        }))
+          orders: response.data.orders.map(GetOrdersMapper.fromHttp),
+        })),
       );
   }
 }

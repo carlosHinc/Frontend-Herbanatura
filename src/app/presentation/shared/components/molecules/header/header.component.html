@@ -1,4 +1,6 @@
 <div class="header">
   <ds-h1 [configH1]="config.h1" />
-  <ds-button (actionEvent)="buttonAction()" [configButton]="config.button" />
+  @if (config.showButton) {
+    <ds-button (actionEvent)="buttonAction()" [configButton]="config.button" />
+  }
 </div>

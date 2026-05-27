@@ -23,4 +23,22 @@
       background-color: #d32f2f;
     }
   }
+
+  &--column {
+    color: #333;
+    padding: 0;
+    background: none;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #2196f3;
+    }
+  }
+
+  &--active-blue {
+    color: #2196f3;
+  }
 }

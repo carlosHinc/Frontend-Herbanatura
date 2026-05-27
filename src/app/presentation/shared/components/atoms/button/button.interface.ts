@@ -1,4 +1,5 @@
 export interface ButtonConfigurationInterface {
   text: string;
-  color: string;
+  modifiers: string;
+  title?: string;
 }

@@ -5,14 +5,10 @@
         @for (column of config().columns; track column.key) {
           <th [class]="column.customClass">
             @if (column.sortable) {
-              <button
-                class="sort-button"
-                (click)="onSort(column.key)"
-                [class.active]="isSortActive(column.key)"
-                [title]="'Ordenar por ' + column.header"
-              >
-                {{ column.header }} {{ getSortIcon(column.key) }}
-              </button>
+              <ds-button
+                [configButton]="getSortButtonConfig(column.key, column.header)"
+                (actionEvent)="onSort(column.key)"
+              />
             } @else {
               {{ column.header }}
             }

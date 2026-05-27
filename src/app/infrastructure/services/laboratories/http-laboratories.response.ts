@@ -5,5 +5,5 @@ export interface HttpLaboratoryData {
 }
 
 export interface HttpGetLaboratoriesResponse {
-  data: HttpLaboratoryData[];
+  data: { laboratories: HttpLaboratoryData[]; count: number };
 }

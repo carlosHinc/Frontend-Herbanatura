@@ -42,6 +42,12 @@ export class MenuService {
           route: '/inventario/proximos-a-vencer',
           badgeColor: 'warning',
         },
+        {
+          title: 'Productos Vencidos',
+          icon: 'bi-exclamation-triangle',
+          route: '/inventario/productos-vencidos',
+          badgeColor: 'danger',
+        },
       ],
     },
     {

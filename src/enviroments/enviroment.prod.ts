@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://backend-herbanatura-production.up.railway.app/api',
+  apiUrl: 'https://87nvsjhj8e.execute-api.us-east-1.amazonaws.com/prod',
 };

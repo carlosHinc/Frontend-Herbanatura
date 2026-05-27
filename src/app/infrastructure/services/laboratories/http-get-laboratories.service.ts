@@ -18,8 +18,10 @@ export class HttpGetLaboratoriesService implements GetLaboratoriesGateway {
       .get<HttpGetLaboratoriesResponse>(`${environment.apiUrl}/laboratories`)
       .pipe(
         map((response) => ({
-          laboratories: response.data.map(LaboratoryMapper.fromHttp),
-        }))
+          laboratories: response.data.laboratories.map(
+            LaboratoryMapper.fromHttp,
+          ),
+        })),
       );
   }
 }

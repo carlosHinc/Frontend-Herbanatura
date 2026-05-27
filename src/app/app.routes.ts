@@ -30,6 +30,13 @@ export const routes: Routes = [
       ).then((m) => m.GetProductsExpiringComponent),
   },
   {
+    path: 'inventario/productos-vencidos',
+    loadComponent: () =>
+      import(
+        './presentation/pages/expired-products/expired-products.component'
+      ).then((m) => m.ExpiredProductsComponent),
+  },
+  {
     path: 'inventario/editar-producto/:id',
     loadComponent: () =>
       import(

@@ -1,3 +1,7 @@
-<button (click)="actionButton()" class="btn btn--{{ configButton.color }}">
+<button
+  [attr.title]="configButton.title"
+  (click)="actionButton()"
+  class="btn {{ configButton.modifiers }}"
+>
   {{ configButton.text }}
 </button>
