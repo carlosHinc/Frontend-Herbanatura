@@ -7,16 +7,18 @@
         HerbaNatura
       </h4>
     </div>
-    
+
     <!-- Botón cerrar en móvil -->
-    <button class="btn sidebar-close d-lg-none" 
-            (click)="hideMobileSidebar()"
-            type="button"
-            aria-label="Cerrar menú">
+    <button
+      class="btn sidebar-close d-lg-none"
+      (click)="hideMobileSidebar()"
+      type="button"
+      aria-label="Cerrar menú"
+    >
       <i class="bi bi-x-lg"></i>
     </button>
   </div>
-  
+
   <!-- Navegación Principal -->
   <div class="sidebar-nav-container">
     <ul class="nav flex-column sidebar-nav">
@@ -24,39 +26,57 @@
         <li class="nav-item">
           <!-- Item con submenú -->
           @if (item.hasSubmenu) {
-            <a class="nav-link dropdown-toggle" 
-               href="#" 
-               (click)="toggleSubmenu(item.id); $event.preventDefault()"
-               [class.active]="isSubmenuOpen(item.id)"
-               [attr.aria-expanded]="isSubmenuOpen(item.id)"
-               [attr.aria-controls]="item.id + '-submenu'">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              (click)="toggleSubmenu(item.id); $event.preventDefault()"
+              [class.active]="isSubmenuOpen(item.id)"
+              [attr.aria-expanded]="isSubmenuOpen(item.id)"
+              [attr.aria-controls]="item.id + '-submenu'"
+            >
               <i class="nav-icon bi" [ngClass]="item.icon"></i>
-              <span class="nav-text" [class.d-none]="!isMobile() && isCollapsed()">
+              <span
+                class="nav-text"
+                [class.d-none]="!isMobile() && isCollapsed()"
+              >
                 {{ item.title }}
               </span>
               @if (item.badge && (isMobile() || !isCollapsed())) {
-                <span class="badge ms-auto" [ngClass]="'bg-' + (item.badgeColor || 'primary')">
+                <span
+                  class="badge ms-auto"
+                  [ngClass]="'bg-' + (item.badgeColor || 'primary')"
+                >
                   {{ item.badge }}
                 </span>
               }
             </a>
-            
+
             <!-- Submenú -->
             @if (item.submenu && isSubmenuOpen(item.id)) {
               <div class="submenu-container" [id]="item.id + '-submenu'">
                 <ul class="nav flex-column submenu">
                   @for (subitem of item.submenu; track subitem.route) {
                     <li class="nav-item">
-                      <a class="nav-link submenu-link" 
-                         [routerLink]="subitem.route" 
-                         routerLinkActive="active"
-                         (click)="onMenuItemClick()">
+                      <a
+                        class="nav-link submenu-link"
+                        [routerLink]="subitem.route"
+                        routerLinkActive="active"
+                        (click)="onMenuItemClick()"
+                      >
                         <i class="nav-icon bi" [ngClass]="subitem.icon"></i>
-                        <span class="nav-text" [class.d-none]="!isMobile() && isCollapsed()">
+                        <span
+                          class="nav-text"
+                          [class.d-none]="!isMobile() && isCollapsed()"
+                        >
                           {{ subitem.title }}
                         </span>
                         @if (subitem.badge && (isMobile() || !isCollapsed())) {
-                          <span class="badge ms-auto" [ngClass]="'bg-' + (subitem.badgeColor || 'primary')">
+                          <span
+                            class="badge ms-auto"
+                            [ngClass]="
+                              'bg-' + (subitem.badgeColor || 'primary')
+                            "
+                          >
                             {{ subitem.badge }}
                           </span>
                         }
@@ -68,16 +88,24 @@
             }
           } @else {
             <!-- Item simple -->
-            <a class="nav-link" 
-               [routerLink]="item.route" 
-               routerLinkActive="active"
-               (click)="onMenuItemClick()">
+            <a
+              class="nav-link"
+              [routerLink]="item.route"
+              routerLinkActive="active"
+              (click)="onMenuItemClick()"
+            >
               <i class="nav-icon bi" [ngClass]="item.icon"></i>
-              <span class="nav-text" [class.d-none]="!isMobile() && isCollapsed()">
+              <span
+                class="nav-text"
+                [class.d-none]="!isMobile() && isCollapsed()"
+              >
                 {{ item.title }}
               </span>
               @if (item.badge && (isMobile() || !isCollapsed())) {
-                <span class="badge ms-auto" [ngClass]="'bg-' + (item.badgeColor || 'primary')">
+                <span
+                  class="badge ms-auto"
+                  [ngClass]="'bg-' + (item.badgeColor || 'primary')"
+                >
                   {{ item.badge }}
                 </span>
               }
@@ -87,7 +115,7 @@
       }
     </ul>
   </div>
-  
+
   <!-- Footer del Sidebar -->
   <div class="sidebar-footer">
     <div class="user-info" [class.collapsed]="!isMobile() && isCollapsed()">
@@ -95,17 +123,22 @@
         <i class="bi bi-person-circle"></i>
       </div>
       <div class="user-details" [class.d-none]="!isMobile() && isCollapsed()">
-        <span class="user-name">Carlos Hincapié</span>
+        <span class="user-name">Erika Acevedo</span>
         <small class="user-role">Administrador</small>
       </div>
     </div>
-    
+
     <!-- Botón Toggle solo en desktop -->
-    <button class="btn sidebar-toggle d-none d-lg-block" 
-            (click)="toggleSidebar()"
-            [attr.aria-label]="isCollapsed() ? 'Expandir menú' : 'Contraer menú'"
-            type="button">
-      <i class="bi" [ngClass]="isCollapsed() ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+    <button
+      class="btn sidebar-toggle d-none d-lg-block"
+      (click)="toggleSidebar()"
+      [attr.aria-label]="isCollapsed() ? 'Expandir menú' : 'Contraer menú'"
+      type="button"
+    >
+      <i
+        class="bi"
+        [ngClass]="isCollapsed() ? 'bi-chevron-right' : 'bi-chevron-left'"
+      ></i>
     </button>
   </div>
 </nav>
@@ -116,9 +149,11 @@
 }
 
 <!-- Botón toggle móvil -->
-<button class="btn mobile-toggle d-lg-none" 
-        (click)="toggleSidebar()"
-        type="button"
-        [attr.aria-label]="showMobileSidebar() ? 'Cerrar menú' : 'Abrir menú'">
+<button
+  class="btn mobile-toggle d-lg-none"
+  (click)="toggleSidebar()"
+  type="button"
+  [attr.aria-label]="showMobileSidebar() ? 'Cerrar menú' : 'Abrir menú'"
+>
   <i class="bi" [ngClass]="showMobileSidebar() ? 'bi-x' : 'bi-list'"></i>
 </button>
