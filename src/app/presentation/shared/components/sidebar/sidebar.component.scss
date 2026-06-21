@@ -90,13 +90,17 @@ $z-mobile-toggle: 1001;
 }
 
 @mixin nav-link-active {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
   color: white;
   border-color: rgba(255, 255, 255, 0.3);
   transform: translateX(4px);
-  
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     left: -0.5rem;
     top: 50%;
@@ -115,7 +119,11 @@ $z-mobile-toggle: 1001;
   left: 0;
   height: 100vh;
   width: $sidebar-width;
-  background: linear-gradient(180deg, $herba-primary 0%, $herba-primary-dark 100%);
+  background: linear-gradient(
+    180deg,
+    $herba-primary 0%,
+    $herba-primary-dark 100%
+  );
   color: white;
   transition: $sidebar-transition;
   z-index: $z-sidebar;
@@ -164,7 +172,7 @@ $z-mobile-toggle: 1001;
     transform: translateX(-100%);
     width: $sidebar-mobile-width;
     transition: transform 0.3s ease-in-out;
-    
+
     &.show-mobile {
       transform: translateX(0);
     }
@@ -271,8 +279,8 @@ $z-mobile-toggle: 1001;
       position: relative;
 
       &::after {
-        content: '\F285'; // chevron-right
-        font-family: 'bootstrap-icons';
+        content: "\F285"; // chevron-right
+        font-family: "bootstrap-icons";
         border: none;
         margin-left: auto;
         margin-right: 0.25rem;
@@ -363,6 +371,27 @@ $z-mobile-toggle: 1001;
       font-size: 0.75rem;
       color: rgba(255, 255, 255, 0.7);
     }
+  }
+}
+
+// ATOMS - Botón cerrar sesión
+.sidebar-logout {
+  @include button-reset;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: $sidebar-border-radius;
+  transition: $sidebar-transition;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+
+  &:hover {
+    background: rgba(220, 38, 38, 0.3);
+    color: white;
   }
 }
 

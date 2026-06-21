@@ -1,11 +1,9 @@
-import { Order, OrderDetails } from './orders.entity';
-
-export interface Bill {
-  id: number;
-  type: string;
-  value: number;
-  createdAt: string;
-}
+import {
+  Order,
+  OrderDetails,
+  OrderSummary,
+  ProductBatch,
+} from './orders.entity';
 
 export interface GetOrdersResponse {
   orders: Order[];
@@ -19,5 +17,8 @@ export interface GetOrderDetailsResponse {
 }
 
 export interface CreateOrderResponse {
-  bill: Bill;
+  order: Order;
+  details: OrderDetails[];
+  batches: ProductBatch[];
+  summary: OrderSummary;
 }

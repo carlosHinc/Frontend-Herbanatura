@@ -51,7 +51,7 @@
                     [class]="'btn-action ' + (action.class || '')"
                     [title]="action.title || action.label"
                   >
-                    <span>{{ action.icon }}</span>
+                    <span [innerHTML]="action.icon"></span>
                   </button>
                 }
               </td>

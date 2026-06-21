@@ -123,10 +123,21 @@
         <i class="bi bi-person-circle"></i>
       </div>
       <div class="user-details" [class.d-none]="!isMobile() && isCollapsed()">
-        <span class="user-name">Erika Acevedo</span>
-        <small class="user-role">Administrador</small>
+        <span class="user-name">{{ userName() }}</span>
+        <small class="user-role">{{ userRole() }}</small>
       </div>
     </div>
+
+    <!-- Botón Cerrar Sesión -->
+    <button
+      class="btn sidebar-logout"
+      (click)="logout()"
+      [attr.aria-label]="'Cerrar sesión'"
+      type="button"
+    >
+      <i class="bi bi-box-arrow-left"></i>
+      <span [class.d-none]="!isMobile() && isCollapsed()">Salir</span>
+    </button>
 
     <!-- Botón Toggle solo en desktop -->
     <button

@@ -8,22 +8,23 @@ import { Product } from '@domain/products/products.entity';
  */
 @Injectable()
 export class ProductsTableConfigViewModel {
-  
   /**
    * Genera la configuración completa de la tabla de productos
    * @param products - Array de productos a mostrar en la tabla
    * @param onEdit - Callback cuando se hace clic en editar
    * @param onDelete - Callback cuando se hace clic en eliminar
+   * @param canEdit - Indica si el usuario puede editar productos
    * @returns Configuración completa de DataTable
    */
   getTableConfig(
     products: Product[],
     onEdit: (id: number) => void,
-    onDelete: (id: number) => void
+    onHistory: (id: number) => void,
+    canEdit: boolean = true,
   ): DataTableConfig<Product> {
     return {
       columns: this.getColumns(),
-      actions: this.getActions(onEdit, onDelete),
+      actions: this.getActions(onEdit, onHistory, canEdit),
       data: products,
       trackBy: (index: number, item: Product) => item.id,
     };
@@ -69,28 +70,35 @@ export class ProductsTableConfigViewModel {
   /**
    * Define las acciones disponibles para cada fila
    * @param onEdit - Función a ejecutar al editar
-   * @param onDelete - Función a ejecutar al eliminar
+   * @param onHistory - Función a ejecutar al ver el historial
+   * @param canEdit - Indica si se debe mostrar el botón de editar
    */
   private getActions(
     onEdit: (id: number) => void,
-    onDelete: (id: number) => void
+    onHistory: (id: number) => void,
+    canEdit: boolean = true,
   ) {
-    return [
-      {
+    const actions = [];
+
+    if (canEdit) {
+      actions.push({
         label: 'Editar',
         icon: '✏️',
         handler: (product: Product) => onEdit(product.id),
         class: 'btn-edit',
         title: 'Editar',
-      },
-      {
-        label: 'Eliminar',
-        icon: '🗑️',
-        handler: (product: Product) => onDelete(product.id),
-        class: 'btn-delete',
-        title: 'Eliminar',
-      },
-    ];
+      });
+    }
+
+    actions.push({
+      label: 'Historial',
+      icon: '<i class="bi bi-card-list"></i>',
+      handler: (product: Product) => onHistory(product.id),
+      class: 'btn-edit',
+      title: 'Ver Historial',
+    });
+
+    return actions;
   }
 
   /**

@@ -1,0 +1,360 @@
+.update-supplier-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+
+  .header {
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      color: #333;
+      margin: 0;
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: #f5f5f5;
+    border-radius: 8px;
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #ddd;
+      border-top-color: #007bff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+      font-size: 1rem;
+    }
+  }
+
+  .error-load {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: #ffe6e6;
+    border: 1px solid #ffcccc;
+    border-radius: 8px;
+    text-align: center;
+
+    .error-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      margin: 0 0 1.5rem 0;
+      color: #d32f2f;
+      font-size: 1rem;
+    }
+
+    .error-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+
+      button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+
+        &.btn-retry {
+          background: #ffc107;
+          color: #333;
+
+          &:hover {
+            background: #ffb300;
+          }
+        }
+
+        &.btn-secondary {
+          background: #6c757d;
+          color: white;
+
+          &:hover {
+            background: #5a6268;
+          }
+        }
+      }
+    }
+  }
+
+  .form-container {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 2rem;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      label {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+      }
+
+      input,
+      textarea {
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: border-color 0.3s;
+
+        &:focus {
+          outline: none;
+          border-color: #007bff;
+          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        &.invalid {
+          border-color: #d32f2f;
+          background: #fff3f3;
+        }
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      .error-message {
+        color: #d32f2f;
+        font-size: 0.8rem;
+      }
+
+      .form-hint {
+        color: #999;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+      }
+    }
+
+    .form-error {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: #ffe6e6;
+      border: 1px solid #ffcccc;
+      border-radius: 4px;
+      color: #d32f2f;
+
+      .error-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 1rem;
+
+      button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background 0.3s;
+
+        &.btn-primary {
+          background: #007bff;
+          color: white;
+
+          &:hover:not(:disabled) {
+            background: #0056b3;
+          }
+
+          &:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+          }
+
+          .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+          }
+        }
+
+        &.btn-secondary {
+          background: #6c757d;
+          color: white;
+
+          &:hover:not(:disabled) {
+            background: #5a6268;
+          }
+
+          &:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+
+  .toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 9999;
+
+    .toast {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: slideIn 0.3s ease-out;
+
+      &--success {
+        border-left: 4px solid #4caf50;
+
+        .toast-icon {
+          color: #4caf50;
+        }
+      }
+
+      &--error {
+        border-left: 4px solid #d32f2f;
+
+        .toast-icon {
+          color: #d32f2f;
+        }
+      }
+
+      &--info {
+        border-left: 4px solid #2196f3;
+
+        .toast-icon {
+          color: #2196f3;
+        }
+      }
+
+      .toast-content {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-right: 1rem;
+
+        .toast-icon {
+          font-size: 1.2rem;
+          flex-shrink: 0;
+        }
+
+        .toast-message {
+          color: #333;
+          font-size: 0.95rem;
+        }
+      }
+
+      .toast-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #999;
+        font-size: 1.2rem;
+        padding: 0;
+        flex-shrink: 0;
+
+        &:hover {
+          color: #333;
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .update-supplier-container {
+    padding: 1rem;
+
+    .header {
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .form-container {
+      padding: 1.5rem;
+
+      .form-actions {
+        flex-direction: column;
+
+        button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+
+    .toast-container {
+      bottom: 1rem;
+      right: 1rem;
+      left: 1rem;
+
+      .toast {
+        width: 100%;
+      }
+    }
+  }
+}

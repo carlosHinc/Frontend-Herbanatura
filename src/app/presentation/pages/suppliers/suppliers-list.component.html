@@ -1,0 +1,56 @@
+<ds-list-template>
+  <ds-header
+    header-content
+    [config]="{
+      h1: { text: 'Proveedores', color: 'black' },
+      button: { text: 'Nuevo proveedor', modifiers: 'btn--green' },
+      showButton: true,
+    }"
+    (buttonEvent)="router.navigate(['/inventario/crear-proveedor'])"
+  />
+
+  @if (getSuppliersVM.state().loading) {
+    <ds-loading loading-content [text]="'Cargando proveedores...'" />
+  }
+
+  @if (getSuppliersVM.state().error) {
+    <ds-error-services-list
+      error-service-content
+      [configButton]="{ text: 'Reintentar', modifiers: 'btn--red' }"
+      (retry)="retry()"
+      [errorMessage]="getSuppliersVM.state().error!"
+    />
+  }
+
+  @if (hasLoaded()) {
+    <ng-container search-box-content>
+      <ds-search-box
+        [value]="paginationSortVM.searchTerm$()"
+        [placeholder]="'Buscar proveedor...'"
+        (valueChange)="onSearchChange($event)"
+        (clear)="clearSearch()"
+      />
+    </ng-container>
+  }
+
+  @if (hasLoaded()) {
+    <ds-data-table table-content [config]="tableConfig()" />
+  }
+
+  @if (totalPages() > 1) {
+    <ds-paginator
+      paginator-content
+      [config]="paginationSortVM.getPaginatorConfig(filteredAndSorted().length)"
+      (pageChange)="onPageChange($event)"
+    />
+  }
+
+  @if (isEmpty()) {
+    <ds-empty-state
+      not-results-content
+      message="No hay proveedores"
+      textBtn="Crear proveedor"
+      (click)="router.navigate(['/inventario/crear-proveedor'])"
+    />
+  }
+</ds-list-template>

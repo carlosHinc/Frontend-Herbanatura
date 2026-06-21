@@ -16,10 +16,6 @@ export class HttpCreateOrderService implements CreateOrderGateway {
   execute(orderData: CreateOrder): Observable<CreateOrderResponse> {
     return this.httpClient
       .post<HttpCreateOrderResponse>(`${environment.apiUrl}/orders`, orderData)
-      .pipe(
-        map((response) => ({
-          bill: CreateOrderMapper.fromHttp(response.data.bill),
-        }))
-      );
+      .pipe(map((response) => CreateOrderMapper.fromHttp(response.data)));
   }
 }

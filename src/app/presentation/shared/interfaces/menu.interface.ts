@@ -4,6 +4,7 @@ export interface MenuSubmenu {
   route: string;
   badge?: string;
   badgeColor?: string;
+  permission?: string;
 }
 
 export interface MenuItem {

@@ -9,11 +9,15 @@ export interface HttpBatchData {
   entry_date: string;
 }
 
-export interface HttpBillData {
+export interface HttpOrderDetail {
   id: number;
-  type: string;
-  value: number;
-  createdAt: string;
+  id_bill: number;
+  id_product: number;
+  unit_price: number;
+  amount: number;
+  total_price: number;
+  product_name?: string;
+  laboratory?: string;
 }
 
 export interface HttpOrderSummary {
@@ -22,22 +26,27 @@ export interface HttpOrderSummary {
   totalValue: number;
 }
 
-export interface HttpOrderData {
-  bill: HttpBillData;
-  batches: HttpBatchData[];
-  summary: HttpOrderSummary;
-}
-
 export interface HttpCreateOrderResponse {
   success: boolean;
   message: string;
-  data: HttpOrderData;
+  data: {
+    order: HttpDataOrder & {
+      id_supplier: number;
+      type: string;
+      updated_at: string;
+      supplier?: string;
+    };
+    details: HttpOrderDetail[];
+    batches: HttpBatchData[];
+    summary: HttpOrderSummary;
+  };
 }
 
 export interface HttpDataOrder {
   id: number;
   value: number;
   created_at: string;
+  supplier?: string;
 }
 
 export interface HttpDataOrderDetails {
@@ -57,7 +66,7 @@ export interface HttpGetOrdersResponse {
 
 export interface HttpGetOrderDetailsResponse {
   data: {
-    bill: HttpDataOrder;
+    order: HttpDataOrder;
     details: HttpDataOrderDetails[];
   };
 }

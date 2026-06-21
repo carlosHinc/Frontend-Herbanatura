@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, computed } from '@angular/core';
+import { Component, inject, OnInit, computed, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -8,6 +8,8 @@ import { HttpGetProductsService } from '@infrastructure/services/products/http-g
 import { GetProductsViewModel } from '@presentation/view-models/products/get-productos.view-model';
 import { PaginationSortViewModel } from '@presentation/view-models/shared/pagination-sort.view-model';
 import { ProductsTableConfigViewModel } from '@presentation/view-models/products/products-table-config.view-model';
+import { AuthTokenService } from '@infrastructure/services/auth/auth-token.service';
+import { SystemActionsCode } from '@domain/auth/auth.response';
 import { STORE_INVENTORY_CONFIG } from './store-inventory-ui.config';
 import { SearchBoxComponent } from '@presentation/shared/components/molecules/search-box/search-box.component';
 import { HeaderComponent } from '@presentation/shared/components/molecules/header/header.component';
@@ -26,6 +28,7 @@ import {
 } from '@presentation/shared/components/molecules/paginator/paginator.interface';
 import { Product } from '@domain/products/products.entity';
 import { ListTemplateComponent } from '@presentation/shared/components/templates/list.template/list.template.component';
+import { StoreInventoryUi } from './store-inventory-ui.interface';
 
 @Component({
   standalone: true,
@@ -56,6 +59,7 @@ import { ListTemplateComponent } from '@presentation/shared/components/templates
 })
 export class StoreInventoryComponent implements OnInit {
   private readonly router = inject(Router);
+  private readonly authTokenService = inject(AuthTokenService);
 
   protected readonly getProductsVM = inject(GetProductsViewModel);
 
@@ -64,10 +68,35 @@ export class StoreInventoryComponent implements OnInit {
   );
   private readonly tableConfigVM = inject(ProductsTableConfigViewModel);
 
-  readonly configUI = STORE_INVENTORY_CONFIG;
+  // Configuración dinámica basada en permisos
+  readonly configUI: Signal<StoreInventoryUi> = computed(() => {
+    const permissions = this.authTokenService.getPermissions();
+    const hasCreatePermission = permissions?.some(
+      (p) => p.code === SystemActionsCode.CREATE_PRODUCT,
+    );
+
+    return {
+      ...STORE_INVENTORY_CONFIG,
+      header: {
+        ...STORE_INVENTORY_CONFIG.header,
+        showButton: hasCreatePermission ?? false,
+      },
+    };
+  });
+
+  // Verificar si el usuario puede editar productos
+  protected readonly hasEditPermission = computed(() => {
+    const permissions = this.authTokenService.getPermissions();
+    return (
+      permissions?.some((p) => p.code === SystemActionsCode.EDIT_PRODUCT) ??
+      false
+    );
+  });
 
   constructor() {
-    this.paginationSortVM.setItemsPerPage(this.configUI.itemsPerPage);
+    // Usar el computed para obtener itemsPerPage
+    const perPage = STORE_INVENTORY_CONFIG.itemsPerPage;
+    this.paginationSortVM.setItemsPerPage(perPage);
   }
 
   // Productos filtrados por búsqueda y ordenados
@@ -132,7 +161,8 @@ export class StoreInventoryComponent implements OnInit {
     this.tableConfigVM.getTableConfig(
       this.paginatedProducts(),
       (id: number) => this.goToEditProduct(id),
-      (id: number) => this.handleDeleteProduct(id),
+      (id: number) => this.handleHistory(id),
+      this.hasEditPermission(),
     ),
   );
 
@@ -177,9 +207,8 @@ export class StoreInventoryComponent implements OnInit {
     this.router.navigate([`/inventario/editar-producto/${id}`]);
   }
 
-  handleDeleteProduct(id: number): void {
-    console.log('Eliminar producto:', id);
-    // TODO: Implementar lógica de eliminación
+  handleHistory(id: number): void {
+    this.router.navigate([`/inventario/productos/historial/${id}`]);
   }
 
   retry(): void {

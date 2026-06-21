@@ -16,15 +16,15 @@ export class HttpGetOrderDetailsService implements GetOrderDetailsGateway {
   execute(idOrder: number): Observable<GetOrderDetailsResponse> {
     return this.httpClient
       .get<HttpGetOrderDetailsResponse>(
-        `${environment.apiUrl}/orders/${idOrder}`
+        `${environment.apiUrl}/orders/${idOrder}`,
       )
       .pipe(
         map((response) => ({
           orderDetails: {
-            order: GetOrdersMapper.fromHttp(response.data.bill),
+            order: GetOrdersMapper.fromHttp(response.data.order),
             details: response.data.details.map(GetOrderDetailsMapper.fromHttp),
           },
-        }))
+        })),
       );
   }
 }

@@ -1,7 +1,7 @@
 <ds-list-template>
   <ds-header
     header-content
-    [config]="configUI.header"
+    [config]="configUI().header"
     (buttonEvent)="goToAddProduct()"
   />
 
@@ -9,20 +9,20 @@
     <ds-search-box
       search-box-content
       [value]="paginationSortVM.searchTerm$()"
-      [placeholder]="configUI.placeholderInputSearch"
+      [placeholder]="configUI().placeholderInputSearch"
       (valueChange)="onSearchChange($event)"
       (clear)="clearSearch()"
     />
   }
 
   @if (getProductsVM.state().loading) {
-    <ds-loading loading-content [text]="configUI.textLoading" />
+    <ds-loading loading-content [text]="configUI().textLoading" />
   }
 
   @if (getProductsVM.state().error) {
     <ds-error-services-list
       error-service-content
-      [configButton]="configUI.buttonServiceError"
+      [configButton]="configUI().buttonServiceError"
       (retry)="retry()"
       [errorMessage]="getProductsVM.state().error!"
     />

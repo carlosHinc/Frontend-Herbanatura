@@ -10,8 +10,9 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MenuService } from '../../services/menu.service';
+import { AuthTokenService } from '@infrastructure/services/auth/auth-token.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -24,6 +25,20 @@ export class SidebarComponent implements OnInit {
   @ViewChild('sidebar', { static: true }) sidebar!: ElementRef;
 
   private menuService = inject(MenuService);
+  private authTokenService = inject(AuthTokenService);
+  private router = inject(Router);
+
+  protected readonly userName = computed(
+    () => this.authTokenService.getUser()?.name ?? '',
+  );
+  protected readonly userRole = computed(
+    () => this.authTokenService.getUser()?.role ?? '',
+  );
+
+  logout(): void {
+    this.authTokenService.clearSession();
+    this.router.navigate(['/auth/login']);
+  }
 
   // Computed properties para reactive updates
   isCollapsed = this.menuService.isCollapsed;

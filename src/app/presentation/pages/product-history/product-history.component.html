@@ -1,0 +1,169 @@
+<ds-header [config]="headerConfig"></ds-header>
+
+<div class="back-button-container">
+  <ds-button [configButton]="backButtonConfig" (actionEvent)="goBack()"></ds-button>
+</div>
+
+@if (loading()) {
+  <ds-loading text="Cargando historial del producto..."></ds-loading>
+} @else if (error()) {
+  <ds-error-services-list
+    [errorMessage]="error()!"
+    (retry)="onRetry()"
+  ></ds-error-services-list>
+} @else {
+  <!-- Información del producto -->
+  <section class="product-info">
+    <h2 class="section-title">Información del Producto</h2>
+    <div class="product-card">
+      <div class="product-detail">
+        <span class="label">Nombre:</span>
+        <span class="value">{{ product().name }}</span>
+      </div>
+      <div class="product-detail">
+        <span class="label">Laboratorio:</span>
+        <span class="value">{{ product().laboratory }}</span>
+      </div>
+      <div class="product-detail">
+        <span class="label">Precio de venta:</span>
+        <span class="value">{{
+          product().salesPrice | currency: "COP" : "symbol-narrow" : "1.0-0"
+        }}</span>
+      </div>
+      <div class="product-detail">
+        <span class="label">Stock:</span>
+        <span class="value">{{ product().stock }}</span>
+      </div>
+      @if (product().description) {
+        <div class="product-detail">
+          <span class="label">Descripción:</span>
+          <span class="value">{{ product().description }}</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Historial de ventas -->
+  <section class="history-section">
+    <h2 class="section-title">Historial de Ventas</h2>
+    @if (salesHistory().length === 0) {
+      <p class="empty-message">
+        No hay registros de ventas para este producto.
+      </p>
+    } @else {
+      <div class="table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Precio Unitario</th>
+              <th>Cantidad</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (sale of salesHistory(); track sale.dateSale) {
+              <tr>
+                <td>{{ sale.dateSale | date: "dd/MM/yyyy" }}</td>
+                <td>
+                  {{
+                    sale.unitPrice | currency: "COP" : "symbol-narrow" : "1.0-0"
+                  }}
+                </td>
+                <td>{{ sale.stock }}</td>
+                <td>
+                  {{
+                    sale.totalPrice
+                      | currency: "COP" : "symbol-narrow" : "1.0-0"
+                  }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <!-- Historial de compras -->
+  <section class="history-section">
+    <h2 class="section-title">Historial de Compras</h2>
+    @if (ordersHistory().length === 0) {
+      <p class="empty-message">
+        No hay registros de compras para este producto.
+      </p>
+    } @else {
+      <div class="table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Proveedor</th>
+              <th>Precio Unitario</th>
+              <th>Cantidad</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of ordersHistory(); track order.dateBill) {
+              <tr>
+                <td>{{ order.dateBill | date: "dd/MM/yyyy" }}</td>
+                <td>{{ order.supplier }}</td>
+                <td>
+                  {{
+                    order.unitPrice
+                      | currency: "COP" : "symbol-narrow" : "1.0-0"
+                  }}
+                </td>
+                <td>{{ order.amount }}</td>
+                <td>
+                  {{
+                    order.totalPrice
+                      | currency: "COP" : "symbol-narrow" : "1.0-0"
+                  }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <!-- Historial de vencimientos -->
+  <section class="history-section">
+    <h2 class="section-title">Historial de Vencimientos</h2>
+    @if (expirationDatesHistory().length === 0) {
+      <p class="empty-message">
+        No hay registros de vencimientos para este producto.
+      </p>
+    } @else {
+      <div class="table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Lote</th>
+              <th>Fecha Ingreso</th>
+              <th>Fecha Vencimiento</th>
+              <th>Stock</th>
+              <th>Días desde vencimiento</th>
+              <th>En inventario</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (exp of expirationDatesHistory(); track exp.batchId) {
+              <tr [class.expired]="exp.daysSinceExpiration > 0">
+                <td>{{ exp.batchName }}</td>
+                <td>{{ exp.entryDate | date: "dd/MM/yyyy" }}</td>
+                <td>{{ exp.expirationDate | date: "dd/MM/yyyy" }}</td>
+                <td>{{ exp.stock }}</td>
+                <td>{{ exp.daysSinceExpiration }}</td>
+                <td>{{ exp.isInInventory ? "Sí" : "No" }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+}

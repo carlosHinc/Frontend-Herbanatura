@@ -1,0 +1,161 @@
+<div class="update-supplier-container">
+  <div class="header">
+    <h1>Editar Proveedor</h1>
+  </div>
+
+  <!-- Loading inicial -->
+  @if (loadingSupplier()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Cargando información del proveedor...</p>
+    </div>
+  }
+
+  <!-- Error al cargar proveedor -->
+  @if (
+    !loadingSupplier() &&
+    error() &&
+    getSuppliersVM.state().suppliers.length === 0
+  ) {
+    <div class="error-load">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error() }}</p>
+      <div class="error-actions">
+        <button class="btn-retry" (click)="onRetryLoadSupplier()">
+          Reintentar
+        </button>
+        <button class="btn-secondary" (click)="onCancel()">
+          Volver al listado
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Formulario -->
+  @if (!loadingSupplier() && getSuppliersVM.state().suppliers.length > 0) {
+    <div class="form-container">
+      <form [formGroup]="supplierForm" (ngSubmit)="onSubmit()">
+        <!-- Nombre del Proveedor -->
+        <div class="form-group">
+          <label for="name">Nombre del Proveedor</label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            placeholder="Ej: Proveedor ABC"
+            [class.invalid]="isFieldInvalid('name')"
+          />
+          @if (isFieldInvalid("name")) {
+            <span class="error-message">{{ getErrorMessage("name") }}</span>
+          }
+          <small class="form-hint">Máximo 255 caracteres</small>
+        </div>
+
+        <!-- Teléfono -->
+        <div class="form-group">
+          <label for="cellphone">Teléfono</label>
+          <input
+            type="tel"
+            id="cellphone"
+            formControlName="cellphone"
+            placeholder="Ej: 3001234567"
+            [class.invalid]="isFieldInvalid('cellphone')"
+          />
+          @if (isFieldInvalid("cellphone")) {
+            <span class="error-message">{{
+              getErrorMessage("cellphone")
+            }}</span>
+          }
+          <small class="form-hint">Máximo 50 caracteres (opcional)</small>
+        </div>
+
+        <!-- Dirección -->
+        <div class="form-group">
+          <label for="address">Dirección</label>
+          <textarea
+            id="address"
+            formControlName="address"
+            rows="3"
+            placeholder="Ej: Calle 123 #456, Apartado 789, Ciudad"
+            [class.invalid]="isFieldInvalid('address')"
+          ></textarea>
+          @if (isFieldInvalid("address")) {
+            <span class="error-message">{{ getErrorMessage("address") }}</span>
+          }
+          <small class="form-hint">Máximo 255 caracteres (opcional)</small>
+        </div>
+
+        <!-- Comentarios -->
+        <div class="form-group">
+          <label for="comments">Comentarios</label>
+          <textarea
+            id="comments"
+            formControlName="comments"
+            rows="4"
+            placeholder="Ej: Información adicional o notas sobre el proveedor"
+            [class.invalid]="isFieldInvalid('comments')"
+          ></textarea>
+          @if (isFieldInvalid("comments")) {
+            <span class="error-message">{{
+              getErrorMessage("comments")
+            }}</span>
+          }
+          <small class="form-hint">Máximo 500 caracteres (opcional)</small>
+        </div>
+
+        <!-- Error del formulario -->
+        @if (error()) {
+          <div class="form-error">
+            <span class="error-icon">⚠️</span>
+            <span>{{ error() }}</span>
+          </div>
+        }
+
+        <!-- Botones de acción -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="onCancel()"
+            [disabled]="loading()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="loading() || supplierForm.invalid"
+          >
+            @if (loading()) {
+              <span class="spinner"></span>
+              <span>Actualizando...</span>
+            } @else {
+              <span>Actualizar Proveedor</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Toast Notification -->
+  @if (showToast()) {
+    <div class="toast-container">
+      <div class="toast toast--{{ toastType() }}">
+        <div class="toast-content">
+          <span class="toast-icon">
+            @if (toastType() === "success") {
+              ✓
+            } @else if (toastType() === "error") {
+              ✕
+            } @else {
+              ℹ
+            }
+          </span>
+          <span class="toast-message">{{ toastMessage() }}</span>
+        </div>
+        <button class="toast-close" (click)="showToast.set(false)">✕</button>
+      </div>
+    </div>
+  }
+</div>

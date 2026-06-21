@@ -19,6 +19,10 @@ import { GetProductsViewModel } from '@presentation/view-models/products/get-pro
 import { GetProductsUseCase } from '@application/use-cases/products/get-products.usecase';
 import { GetProductsGateway } from '@domain/products/get-products.gateway';
 import { HttpGetProductsService } from '@infrastructure/services/products/http-get-products.service';
+import { GetSuppliersViewModel } from '@presentation/view-models/suppliers/get-suppliers.view-model';
+import { GetSuppliersUseCase } from '@application/use-cases/suppliers/get-suppliers.usecase';
+import { GetSuppliersGateway } from '@domain/suppliers/get-suppliers.gateway';
+import { HttpGetSuppliersService } from '@infrastructure/services/suppliers/http-get-suppliers.service';
 import { CreateOrder } from '@domain/orders/orders.entity';
 
 @Component({
@@ -38,6 +42,12 @@ import { CreateOrder } from '@domain/orders/orders.entity';
       provide: GetProductsGateway,
       useClass: HttpGetProductsService,
     },
+    GetSuppliersViewModel,
+    GetSuppliersUseCase,
+    {
+      provide: GetSuppliersGateway,
+      useClass: HttpGetSuppliersService,
+    },
   ],
   templateUrl: './create-order.component.html',
   styleUrl: './create-order.component.scss',
@@ -47,16 +57,19 @@ export class CreateOrderComponent implements OnInit {
   private readonly router = inject(Router);
   protected readonly vm = inject(CreateOrderViewModel);
   protected readonly productsVM = inject(GetProductsViewModel);
+  protected readonly suppliersVM = inject(GetSuppliersViewModel);
 
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
 
   protected readonly orderForm: FormGroup = this.fb.group({
+    idSupplier: [null, [Validators.required]],
     batches: this.fb.array([]),
   });
 
   ngOnInit(): void {
     this.productsVM.getProducts();
+    this.suppliersVM.getSuppliers();
     this.addBatch();
   }
 
@@ -68,9 +81,13 @@ export class CreateOrderComponent implements OnInit {
     return this.productsVM.state().products;
   }
 
+  get suppliers() {
+    return this.suppliersVM.state().suppliers;
+  }
+
   createBatchFormGroup(): FormGroup {
     return this.fb.group({
-      idProduct: ['', [Validators.required]],
+      idProduct: [null, [Validators.required]],
       batchName: ['', [Validators.required, Validators.maxLength(100)]],
       expirationDate: ['', [Validators.required]],
       stock: [1, [Validators.required, Validators.min(1)]],
@@ -127,6 +144,7 @@ export class CreateOrderComponent implements OnInit {
 
     try {
       const orderData: CreateOrder = {
+        idSupplier: parseInt(this.orderForm.get('idSupplier')?.value),
         batches: this.batches.controls.map((control) => ({
           idProduct: parseInt(control.get('idProduct')?.value),
           batchName: control.get('batchName')?.value.trim(),
@@ -141,7 +159,8 @@ export class CreateOrderComponent implements OnInit {
     } catch (error: any) {
       console.error('Error al crear orden:', error);
       this.error.set(
-        error.message || 'Error al crear la orden. Por favor, intenta de nuevo.'
+        error.message ||
+          'Error al crear la orden. Por favor, intenta de nuevo.',
       );
     } finally {
       this.loading.set(false);

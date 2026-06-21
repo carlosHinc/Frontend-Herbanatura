@@ -7,21 +7,63 @@
   </div>
 
   @if (error()) {
-  <div class="alert alert-error">
-    <span class="alert-icon">⚠️</span>
-    <span>{{ error() }}</span>
-  </div>
-  } @if (productsVM.state().error) {
-  <div class="alert alert-error">
-    <span class="alert-icon">⚠️</span>
-    <span>{{ productsVM.state().error }}</span>
-    <button class="btn-retry" (click)="onRetryLoadProducts()">
-      Reintentar cargar productos
-    </button>
-  </div>
+    <div class="alert alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+  @if (productsVM.state().error) {
+    <div class="alert alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ productsVM.state().error }}</span>
+      <button class="btn-retry" (click)="onRetryLoadProducts()">
+        Reintentar cargar productos
+      </button>
+    </div>
   }
 
   <form [formGroup]="orderForm" (ngSubmit)="onSubmit()" class="order-form">
+    <!-- Proveedor -->
+    <div class="supplier-section">
+      <h2>Proveedor</h2>
+      <div class="form-group">
+        <label for="idSupplier"
+          >Proveedor <span class="required">*</span></label
+        >
+
+        <ng-select
+          [items]="suppliers"
+          bindLabel="name"
+          bindValue="id"
+          formControlName="idSupplier"
+          placeholder="Selecciona un proveedor"
+          [searchable]="true"
+          [clearable]="true"
+          [loading]="suppliersVM.state().loading"
+          loadingText="Cargando proveedores..."
+          notFoundText="No se encontraron proveedores"
+          [class.invalid]="
+            orderForm.get('idSupplier')?.invalid &&
+            (orderForm.get('idSupplier')?.touched ||
+              orderForm.get('idSupplier')?.dirty)
+          "
+        >
+        </ng-select>
+
+        @if (
+          orderForm.get("idSupplier")?.invalid &&
+          (orderForm.get("idSupplier")?.touched ||
+            orderForm.get("idSupplier")?.dirty)
+        ) {
+          <span class="error-message">{{ getErrorMessage("required") }}</span>
+        }
+
+        @if (suppliersVM.state().error) {
+          <span class="error-message">{{ suppliersVM.state().error }}</span>
+        }
+      </div>
+    </div>
+
     <!-- Sección de lotes -->
     <div class="batches-section">
       <div class="section-header">
@@ -38,175 +80,177 @@
 
       <div formArrayName="batches" class="batches-list">
         @for (batch of batches.controls; track $index) {
-        <div [formGroupName]="$index" class="batch-card">
-          <div class="batch-header">
-            <h3>Lote #{{ $index + 1 }}</h3>
-            @if (batches.length > 1) {
-            <button
-              type="button"
-              class="btn-remove"
-              (click)="removeBatch($index)"
-              title="Eliminar lote"
-            >
-              🗑️
-            </button>
-            }
-          </div>
-
-          <div class="batch-form">
-            <!-- Producto -->
-            <div class="form-group">
-              <label [for]="'product-' + $index"
-                >Producto <span class="required">*</span></label
-              >
-
-              @if (productsVM.state().loading) {
-              <div class="loading-select">
-                <span class="spinner-small"></span>
-                <span>Cargando productos...</span>
-              </div>
-              } @else {
-              <ng-select
-                [items]="products"
-                bindLabel="name"
-                bindValue="id"
-                [formControl]="getProductControl($index)"
-                placeholder="Selecciona un producto"
-                [searchable]="true"
-                [clearable]="true"
-                notFoundText="No se encontraron productos"
-                [class.invalid]="isBatchFieldInvalid($index, 'idProduct')"
-              >
-                <ng-template ng-label-tmp let-item="item">
-                  {{ item.name }} - {{ item.laboratory }}
-                </ng-template>
-                <ng-template
-                  ng-option-tmp
-                  let-item="item"
-                  let-search="searchTerm"
+          <div [formGroupName]="$index" class="batch-card">
+            <div class="batch-header">
+              <h3>Lote #{{ $index + 1 }}</h3>
+              @if (batches.length > 1) {
+                <button
+                  type="button"
+                  class="btn-remove"
+                  (click)="removeBatch($index)"
+                  title="Eliminar lote"
                 >
-                  <div class="product-option">
-                    <div class="product-name">{{ item.name }}</div>
-                    <div class="product-lab">{{ item.laboratory }}</div>
-                  </div>
-                </ng-template>
-              </ng-select>
-
-              @if (isBatchFieldInvalid($index, 'idProduct')) {
-              <span class="error-message">{{
-                getErrorMessage("required")
-              }}</span>
-              } }
-            </div>
-
-            <!-- Nombre del lote -->
-            <div class="form-group">
-              <label [for]="'batchName-' + $index"
-                >Nombre del Lote <span class="required">*</span></label
-              >
-              <input
-                type="text"
-                [id]="'batchName-' + $index"
-                formControlName="batchName"
-                placeholder="Ej: LOTE-2024-001"
-                [class.invalid]="isBatchFieldInvalid($index, 'batchName')"
-              />
-              @if (isBatchFieldInvalid($index, 'batchName')) {
-              <span class="error-message">{{
-                getErrorMessage("required")
-              }}</span>
+                  🗑️
+                </button>
               }
             </div>
 
-            <div class="form-row">
-              <!-- Fecha de vencimiento -->
+            <div class="batch-form">
+              <!-- Producto -->
               <div class="form-group">
-                <label [for]="'expirationDate-' + $index"
-                  >Fecha de Vencimiento <span class="required">*</span></label
+                <label [for]="'product-' + $index"
+                  >Producto <span class="required">*</span></label
                 >
-                <input
-                  type="date"
-                  [id]="'expirationDate-' + $index"
-                  formControlName="expirationDate"
-                  [class.invalid]="
-                    isBatchFieldInvalid($index, 'expirationDate')
-                  "
-                />
-                @if (isBatchFieldInvalid($index, 'expirationDate')) {
-                <span class="error-message">{{
-                  getErrorMessage("required")
-                }}</span>
+
+                <ng-select
+                  [items]="products"
+                  bindLabel="name"
+                  bindValue="id"
+                  [formControl]="getProductControl($index)"
+                  placeholder="Selecciona un producto"
+                  [searchable]="true"
+                  [clearable]="true"
+                  [loading]="productsVM.state().loading"
+                  loadingText="Cargando productos..."
+                  notFoundText="No se encontraron productos"
+                  [class.invalid]="isBatchFieldInvalid($index, 'idProduct')"
+                >
+                  <ng-template ng-label-tmp let-item="item">
+                    {{ item.name }} - {{ item.laboratory }}
+                  </ng-template>
+                  <ng-template
+                    ng-option-tmp
+                    let-item="item"
+                    let-search="searchTerm"
+                  >
+                    <div class="product-option">
+                      <div class="product-name">{{ item.name }}</div>
+                      <div class="product-lab">{{ item.laboratory }}</div>
+                    </div>
+                  </ng-template>
+                </ng-select>
+
+                @if (isBatchFieldInvalid($index, "idProduct")) {
+                  <span class="error-message">{{
+                    getErrorMessage("required")
+                  }}</span>
                 }
               </div>
 
-              <!-- Stock -->
+              <!-- Nombre del lote -->
               <div class="form-group">
-                <label [for]="'stock-' + $index"
-                  >Cantidad <span class="required">*</span></label
+                <label [for]="'batchName-' + $index"
+                  >Nombre del Lote <span class="required">*</span></label
                 >
-                <input
-                  type="number"
-                  [id]="'stock-' + $index"
-                  formControlName="stock"
-                  placeholder="0"
-                  min="1"
-                  [class.invalid]="isBatchFieldInvalid($index, 'stock')"
-                />
-                @if (isBatchFieldInvalid($index, 'stock')) {
-                <span class="error-message">{{ getErrorMessage("min") }}</span>
-                }
-              </div>
-            </div>
-
-            <div class="form-row">
-              <!-- Precio unitario -->
-              <div class="form-group">
-                <label [for]="'unitPrice-' + $index"
-                  >Precio Compra Unitario <span class="required">*</span></label
-                >
-                <input
-                  type="number"
-                  [id]="'unitPrice-' + $index"
-                  formControlName="unitPurchasePrice"
-                  placeholder="0"
-                  min="0"
-                  [class.invalid]="
-                    isBatchFieldInvalid($index, 'unitPurchasePrice')
-                  "
-                />
-                <small class="field-hint">Precio por unidad en pesos</small>
-                @if (isBatchFieldInvalid($index, 'unitPurchasePrice')) {
-                <span class="error-message">{{ getErrorMessage("min") }}</span>
-                }
-              </div>
-
-              <!-- Precio total (readonly) -->
-              <div class="form-group">
-                <label [for]="'totalPrice-' + $index">Precio Total</label>
                 <input
                   type="text"
-                  [id]="'totalPrice-' + $index"
-                  [value]="getFormattedPrice(getBatchTotalPrice($index))"
-                  readonly
-                  class="readonly-field"
+                  [id]="'batchName-' + $index"
+                  formControlName="batchName"
+                  placeholder="Ej: LOTE-2024-001"
+                  [class.invalid]="isBatchFieldInvalid($index, 'batchName')"
                 />
-                <small class="field-hint">Calculado automáticamente</small>
+                @if (isBatchFieldInvalid($index, "batchName")) {
+                  <span class="error-message">{{
+                    getErrorMessage("required")
+                  }}</span>
+                }
+              </div>
+
+              <div class="form-row">
+                <!-- Fecha de vencimiento -->
+                <div class="form-group">
+                  <label [for]="'expirationDate-' + $index"
+                    >Fecha de Vencimiento <span class="required">*</span></label
+                  >
+                  <input
+                    type="date"
+                    [id]="'expirationDate-' + $index"
+                    formControlName="expirationDate"
+                    [class.invalid]="
+                      isBatchFieldInvalid($index, 'expirationDate')
+                    "
+                  />
+                  @if (isBatchFieldInvalid($index, "expirationDate")) {
+                    <span class="error-message">{{
+                      getErrorMessage("required")
+                    }}</span>
+                  }
+                </div>
+
+                <!-- Stock -->
+                <div class="form-group">
+                  <label [for]="'stock-' + $index"
+                    >Cantidad <span class="required">*</span></label
+                  >
+                  <input
+                    type="number"
+                    [id]="'stock-' + $index"
+                    formControlName="stock"
+                    placeholder="0"
+                    min="1"
+                    [class.invalid]="isBatchFieldInvalid($index, 'stock')"
+                  />
+                  @if (isBatchFieldInvalid($index, "stock")) {
+                    <span class="error-message">{{
+                      getErrorMessage("min")
+                    }}</span>
+                  }
+                </div>
+              </div>
+
+              <div class="form-row">
+                <!-- Precio unitario -->
+                <div class="form-group">
+                  <label [for]="'unitPrice-' + $index"
+                    >Precio Compra Unitario
+                    <span class="required">*</span></label
+                  >
+                  <input
+                    type="number"
+                    [id]="'unitPrice-' + $index"
+                    formControlName="unitPurchasePrice"
+                    placeholder="0"
+                    min="0"
+                    [class.invalid]="
+                      isBatchFieldInvalid($index, 'unitPurchasePrice')
+                    "
+                  />
+                  <small class="field-hint">Precio por unidad en pesos</small>
+                  @if (isBatchFieldInvalid($index, "unitPurchasePrice")) {
+                    <span class="error-message">{{
+                      getErrorMessage("min")
+                    }}</span>
+                  }
+                </div>
+
+                <!-- Precio total (readonly) -->
+                <div class="form-group">
+                  <label [for]="'totalPrice-' + $index">Precio Total</label>
+                  <input
+                    type="text"
+                    [id]="'totalPrice-' + $index"
+                    [value]="getFormattedPrice(getBatchTotalPrice($index))"
+                    readonly
+                    class="readonly-field"
+                  />
+                  <small class="field-hint">Calculado automáticamente</small>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        } @if (batches.length === 0) {
-        <div class="empty-state">
-          <p>No hay lotes agregados</p>
-          <button
-            type="button"
-            class="btn-primary"
-            (click)="addBatch()"
-            [disabled]="productsVM.state().loading"
-          >
-            + Agregar Primer Lote
-          </button>
-        </div>
+        }
+        @if (batches.length === 0) {
+          <div class="empty-state">
+            <p>No hay lotes agregados</p>
+            <button
+              type="button"
+              class="btn-primary"
+              (click)="addBatch()"
+              [disabled]="productsVM.state().loading"
+            >
+              + Agregar Primer Lote
+            </button>
+          </div>
         }
       </div>
     </div>
@@ -254,14 +298,15 @@
           loading() ||
           orderForm.invalid ||
           batches.length === 0 ||
-          productsVM.state().loading
+          productsVM.state().loading ||
+          suppliersVM.state().loading
         "
       >
         @if (loading()) {
-        <span class="spinner"></span>
-        <span>Creando Orden...</span>
+          <span class="spinner"></span>
+          <span>Creando Orden...</span>
         } @else {
-        <span>Crear Orden de Compra</span>
+          <span>Crear Orden de Compra</span>
         }
       </button>
     </div>

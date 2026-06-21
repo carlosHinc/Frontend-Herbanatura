@@ -1,0 +1,120 @@
+<div class="create-product-container">
+  <div class="header">
+    <h1>Crear Proveedor</h1>
+    <button class="btn-back" (click)="onCancel()">
+      ← Volver al Inventario
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <span class="alert-icon">⚠️</span>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="product-form">
+    <div class="form-section">
+      <h2>Información del Proveedor</h2>
+
+      <div class="form-group">
+        <label for="name">Nombre <span class="required">*</span></label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="Ej: Distribuciones S.A."
+          [class.invalid]="isFieldInvalid('name')"
+        />
+        @if (isFieldInvalid("name")) {
+          <span class="error-message">{{ getErrorMessage("name") }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="cellphone">Celular</label>
+        <input
+          id="cellphone"
+          type="text"
+          formControlName="cellphone"
+          placeholder="Ej: 3001234567"
+          [class.invalid]="isFieldInvalid('cellphone')"
+        />
+        @if (isFieldInvalid("cellphone")) {
+          <span class="error-message">{{ getErrorMessage("cellphone") }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="address">Dirección</label>
+        <input
+          id="address"
+          type="text"
+          formControlName="address"
+          placeholder="Ej: Calle 123 #45-67"
+          [class.invalid]="isFieldInvalid('address')"
+        />
+        @if (isFieldInvalid("address")) {
+          <span class="error-message">{{ getErrorMessage("address") }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="comments">Comentarios</label>
+        <textarea
+          id="comments"
+          formControlName="comments"
+          rows="4"
+          placeholder="Ej: Información adicional sobre el proveedor"
+          [class.invalid]="isFieldInvalid('comments')"
+        ></textarea>
+        @if (isFieldInvalid("comments")) {
+          <span class="error-message">{{ getErrorMessage("comments") }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="onCancel()"
+        [disabled]="loading()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="loading() || form.invalid"
+      >
+        @if (loading()) {
+          <span class="spinner"></span>
+          <span>Creando...</span>
+        } @else {
+          <span>Crear Proveedor</span>
+        }
+      </button>
+    </div>
+  </form>
+
+  @if (showToast()) {
+    <div class="toast-container">
+      <div class="toast toast--{{ toastType() }}">
+        <div class="toast-content">
+          <span class="toast-icon">
+            @if (toastType() === "success") {
+              ✓
+            } @else if (toastType() === "error") {
+              ✕
+            } @else {
+              ℹ
+            }
+          </span>
+          <span class="toast-message">{{ toastMessage() }}</span>
+        </div>
+        <button class="toast-close" (click)="showToast.set(false)">✕</button>
+      </div>
+    </div>
+  }
+</div>
