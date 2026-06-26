@@ -195,7 +195,7 @@ export class CreateSaleComponent implements OnInit {
       };
 
       await this.vm.execute(saleData);
-      this.router.navigate(['/store-inventory']);
+      this.router.navigate(['/ventas']);
     } catch (error: any) {
       console.error('Error al crear venta:', error);
       this.error.set(
@@ -208,7 +208,7 @@ export class CreateSaleComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/store-inventory']);
+    this.router.navigate(['/inventario/productos']);
   }
 
   // Helpers para validaciones
